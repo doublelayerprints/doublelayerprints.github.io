@@ -27,7 +27,7 @@ const translations = {
     
     // Home Page - About
     aboutHello: "Hello! We are Tancredi & GF.",
-    aboutText: "Welcome to DoubleLayer! We are a couple obsessed with 3D printing and digital fabrication. What started as a hobby in our living room has evolved into a full-scale micro-factory. We design, prototype, and print every single object you see in our store with extreme attention to detail.",
+    aboutText: "Welcome to Double LayeR Prints! We are a couple obsessed with 3D printing and digital fabrication. What started as a hobby in our living room has evolved into a full-scale micro-factory. We design, prototype, and print every single object you see in our store with extreme attention to detail.",
     getInTouch: "Get in Touch",
     
     // Catalog Page
@@ -114,7 +114,7 @@ const translations = {
     
     // Home Page - About
     aboutHello: "Ciao! Siamo Tancredi & GF.",
-    aboutText: "Benvenuti in DoubleLayer! Siamo una coppia appassionata di stampa 3D e fabbricazione digitale. Quello che è iniziato come un hobby nel nostro salotto si è evoluto in una micro-fabbrica a tutti gli effetti. Progettiamo, prototipiamo e stampiamo ogni singolo oggetto che vedi nel nostro negozio con estrema attenzione ai dettagli.",
+    aboutText: "Benvenuti in Double LayeR Prints! Siamo una coppia appassionata di stampa 3D e fabbricazione digitale. Quello che è iniziato come un hobby nel nostro salotto si è evoluto in una micro-fabbrica a tutti gli effetti. Progettiamo, prototipiamo e stampiamo ogni singolo oggetto che vedi nel nostro negozio con estrema attenzione ai dettagli.",
     getInTouch: "Contattaci",
     
     // Catalog Page

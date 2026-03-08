@@ -11,8 +11,9 @@ export default function Home() {
 
   return (
     <div className="animate-fade-in" style={styles.containerWrapper}>
-      {/* Hero Section */}
       <section style={{...styles.sectionCommon, ...styles.hero}}>
+        <div style={styles.heroBg}></div>
+        <div style={styles.heroGradient}></div>
         <div style={styles.heroContent}>
           <h1 style={styles.heroTitle}>
             {t('heroTitle_1')}<span className="text-glow" style={{ color: 'var(--color-primary)' }}>{t('heroTitle_2')}</span>
@@ -29,7 +30,6 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div style={styles.bgGlow}></div>
       </section>
 
       {/* Features Banner */}
@@ -133,18 +133,27 @@ const styles = {
     justifyContent: 'center',
     flexWrap: 'wrap'
   },
-  bgGlow: {
+  heroBg: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '60vw',
-    height: '60vw',
-    maxWidth: '800px',
-    maxHeight: '800px',
-    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(15, 16, 20, 0) 70%)',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundImage: 'url("/foto_home_page.jpg")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    opacity: 0.25,
     zIndex: 1,
-    pointerEvents: 'none'
+  },
+  heroGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(to bottom, rgba(15, 16, 20, 0.1) 0%, var(--color-bg) 100%)',
+    zIndex: 2,
+    pointerEvents: 'none',
   },
   features: {
     borderBottom: '1px solid var(--color-border)',

@@ -11,7 +11,14 @@ export default function Footer() {
         <div style={styles.grid}>
           {/* Brand */}
           <div style={styles.col}>
-            <h3 style={styles.brand}>DoubleLayer</h3>
+            <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              <img src="/logo.png" alt="Double LayeR Prints" style={{height: '32px'}} />
+              <h3 style={styles.brand}>
+                <span style={{ color: 'var(--color-primary)' }}>Double</span>
+                <span style={{ color: 'var(--color-accent)' }}>LayeR</span>
+                {' '}Prints
+              </h3>
+            </div>
             <p style={styles.text}>
               {t('brandDesc')}
             </p>
@@ -38,9 +45,7 @@ export default function Footer() {
         </div>
 
         <div style={styles.bottom}>
-          <p>
-            © {new Date().getFullYear()} DoubleLayer. Built with <Heart size={14} style={{color: 'var(--color-error)', display: 'inline', verticalAlign: 'middle'}}/> by Tancredi & GF.
-          </p>
+            © {new Date().getFullYear()} Double LayeR Prints. Built with <Heart size={14} style={{color: 'var(--color-error)', display: 'inline', verticalAlign: 'middle'}}/> by Tancredi & GF.
         </div>
       </div>
     </footer>
