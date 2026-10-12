@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img">
+<rect width="1200" height="900" fill="#211a2e"/>
+<rect x="-80.0" y="0.0" width="1360" height="119.0" fill="#2b2337"/>
+<rect x="-80.0" y="132.6" width="1360" height="95.5" fill="#352d47"/>
+<rect x="-80.0" y="236.3" width="1360" height="42.2" fill="#2b2337"/>
+<rect x="-132.0" y="283.6" width="1360" height="39.0" fill="#2b2337"/>
+<rect x="-80.0" y="335.8" width="1360" height="147.7" fill="#2b2337"/>
+<rect x="-80.0" y="499.5" width="1360" height="42.6" fill="#403756"/>
+<rect x="-80.0" y="516.6" width="1360" height="8.2" fill="#ffce00"/>
+<rect x="-80.0" y="547.0" width="1360" height="49.8" fill="#2b2337"/>
+<rect x="-80.0" y="602.0" width="1360" height="82.4" fill="#2b2337"/>
+<text x="48" y="856" font-family="'Space Mono', ui-monospace, monospace" font-size="22" letter-spacing="1" fill="#cfc9da" opacity="0.5">dragon-bust · layer 0.2 mm</text>
+</svg>

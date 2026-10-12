@@ -1,0 +1,165 @@
+---
+import { pathFor, asset } from '../i18n/utils';
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'works'>;
+  lang: Lang;
+}
+const { entry, lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+const slug = entry.id.replace(/\.(it|en)$/, '');
+const catKey = `cat.${entry.data.category}` as UIKey;
+const src = entry.data.photos[0];
+const srcAlt = entry.data.alt;
+const isSvg = src.endsWith('.svg');
+const srcDark = src.replace(/\.svg$/, '-dark.svg');
+const srcLight = asset(src);
+const darkSrc = asset(srcDark);
+---
+
+<article class="plate" data-category={entry.data.category}>
+  <a class="plate__link" href={pathFor(`lavori/${slug}`, lang)}>
+    <i class="plate__gold" aria-hidden="true"></i>
+    <div class="plate__media">
+      <img
+        class={isSvg ? 'plate__img--light' : undefined}
+        src={srcLight}
+        alt={srcAlt}
+        width="1200"
+        height="900"
+        loading="lazy"
+        decoding="async"
+      />
+      {
+        isSvg && (
+          <img
+            class="plate__img--dark"
+            src={darkSrc}
+            alt={srcAlt}
+            width="1200"
+            height="900"
+            loading="lazy"
+            decoding="async"
+          />
+        )
+      }
+    </div>
+    <div class="plate__meta">
+      <div class="plate__name">
+        <h3 class="plate__title">{entry.data.title}</h3>
+        <p class="plate__cat">{t(catKey)}</p>
+      </div>
+      <p class="plate__spec">
+        <span>{entry.data.materials}</span>
+        <span>{entry.data.layerHeight}</span>
+      </p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .plate {
+    border: 1px solid var(--line-dark);
+    background: var(--paper);
+    height: 100%;
+  }
+
+  .plate__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  /* il secondo strato: una linea oro che si stende al passaggio */
+  .plate__gold {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s var(--ease-lay);
+    z-index: 1;
+  }
+  .plate__link:hover .plate__gold,
+  .plate__link:focus-visible .plate__gold {
+    transform: scaleX(1);
+  }
+
+  .plate__media {
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--paper-dim);
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .plate__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s var(--ease-lay);
+  }
+  .plate__link:hover .plate__media img,
+  .plate__link:focus-visible .plate__media img {
+    transform: scale(1.025);
+  }
+
+  /* Placeholder doppia sorgente: variante Notturno degli SVG */
+  .plate__img--dark {
+    display: none;
+  }
+  :root[data-theme='dark'] .plate__img--light {
+    display: none;
+  }
+  :root[data-theme='dark'] .plate__img--dark {
+    display: block;
+  }
+
+  .plate__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.1rem 1.05rem;
+    margin-top: auto;
+  }
+
+  .plate__title {
+    font-size: 1.22rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .plate__cat {
+    margin-top: 0.3rem;
+    font-size: var(--text-sm);
+    color: var(--muted);
+  }
+  .plate__spec {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-align: right;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 520px) {
+    .plate__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.45rem;
+    }
+    .plate__spec {
+      text-align: left;
+    }
+  }
+</style>

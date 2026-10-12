@@ -1,0 +1,189 @@
+---
+/**
+ * Gruppo "strumenti" della nav: toggle tema + switch lingua.
+ * Usato due volte: nel cluster desktop e nel footer del pannello mobile.
+ * Lo script di stato del tema vive in Nav.astro (seleziona tutti i
+ * [data-theme-btn] della pagina).
+ */
+import { pathFor } from '../i18n/utils';
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  canonical: string;
+  other: Lang;
+}
+const { lang, canonical, other } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+---
+
+<div class="tools">
+  <button
+    class="tools__theme"
+    data-theme-btn
+    data-label-dark={t('nav.themeDark')}
+    data-label-light={t('nav.themeLight')}
+    aria-pressed="false"
+    aria-label={t('nav.themeDark')}
+  >
+    <svg
+      class="tools__theme-moon"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+    <svg
+      class="tools__theme-sun"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </button>
+
+  <span class="tools__sep" aria-hidden="true"></span>
+
+  <div class="tools__lang">
+    <a
+      href={pathFor(canonical, lang)}
+      aria-current="true"
+      class="tools__lang-item tools__lang-cur"
+    >
+      {lang === 'it' ? 'IT' : 'EN'}
+    </a>
+    <span class="tools__lang-slash" aria-hidden="true">/</span>
+    <a
+      href={pathFor(canonical, other)}
+      hreflang={other}
+      class="tools__lang-item"
+    >
+      {other === 'it' ? 'IT' : 'EN'}
+    </a>
+  </div>
+</div>
+
+<style>
+  /* Segmented Control Plate per Tool (Tema + Lingua) */
+  .tools {
+    display: inline-flex;
+    align-items: center;
+    height: 2.125rem; /* ~34px */
+    border: 1px solid var(--line-dark);
+    background: color-mix(in srgb, var(--paper-dim) 50%, transparent);
+    font-family: var(--font-mono);
+  }
+
+  .tools__theme {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.125rem;
+    height: 100%;
+    padding: 0;
+    color: var(--ink-soft);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition:
+      color 0.16s ease,
+      background 0.16s ease;
+  }
+  .tools__theme svg {
+    transition: transform 0.22s var(--ease-lay);
+  }
+  .tools__theme:hover {
+    color: var(--purple-text);
+    background: color-mix(in srgb, var(--purple-text) 10%, transparent);
+  }
+  .tools__theme:hover svg {
+    transform: rotate(15deg);
+  }
+  :root[data-theme='dark'] .tools__theme:hover {
+    color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+
+  .tools__theme-sun {
+    display: none;
+  }
+  .tools__theme-moon {
+    display: block;
+  }
+
+  :root[data-theme='dark'] .tools__theme-moon,
+  .tools__theme[aria-pressed='true'] .tools__theme-moon {
+    display: none;
+  }
+  :root[data-theme='dark'] .tools__theme-sun,
+  .tools__theme[aria-pressed='true'] .tools__theme-sun {
+    display: block;
+  }
+
+  .tools__sep {
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: var(--line-dark);
+  }
+
+  /* Switch lingua */
+  .tools__lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-inline: 0.7rem;
+    height: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+  }
+  .tools__lang-item {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.1rem 0.15rem;
+    transition: color 0.16s ease;
+  }
+  .tools__lang-item:hover {
+    color: var(--ink);
+  }
+  .tools__lang-cur,
+  .tools__lang-item[aria-current] {
+    color: var(--purple-text);
+    font-weight: 700;
+  }
+  .tools__lang-slash {
+    color: var(--line-dark);
+    font-size: 0.7rem;
+    user-select: none;
+  }
+
+  .tools__theme:focus-visible,
+  .tools__lang-item:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+</style>

@@ -1,0 +1,147 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageRail from '../PageRail.astro';
+import ProductPlate from '../ProductPlate.astro';
+import LayerLines from '../LayerLines.astro';
+import { ui, type UIKey, type Lang } from '../../i18n/ui';
+import { SITE } from '../../consts';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+
+const works = (await getCollection('works'))
+  .filter((e) => e.id.endsWith(`.${lang}`))
+  .sort((a, b) => a.data.order - b.data.order);
+
+const cats = ['all', 'figures', 'home', 'tools', 'art'] as const;
+const catLabel = (c: string) =>
+  c === 'all' ? t('works.filter.all') : t(`cat.${c}` as UIKey);
+---
+
+<Base lang={lang} canonical="lavori" title={`${t('works.title')} · ${SITE.name}`}>
+  <PageRail
+    lang={lang}
+    sections={[
+      { id: 'archivio', label: 'rail.archive' },
+      { id: 'pezzi', label: 'rail.pieces' },
+    ]}
+  />
+  <section class="section">
+    <div class="container">
+      <div class="section-head" id="archivio">
+        <span class="section-eyebrow">{t('works.eyebrow')}</span>
+        <h1 class="section-title">{t('works.title')}</h1>
+        <p class="section-intro">{t('works.intro')}</p>
+      </div>
+
+      <div class="controls">
+        <div class="chips" role="group" aria-label={t('works.filterLabel')}>
+          {
+            cats.map((c) => (
+              <button class="chip" type="button" data-filter={c} aria-pressed={c === 'all' ? 'true' : 'false'}>
+                {catLabel(c)}
+              </button>
+            ))
+          }
+        </div>
+        <p class="count">
+          <span data-count>{works.length}</span> {t('works.count')}
+        </p>
+      </div>
+
+      <div class="works-grid" data-grid id="pezzi">
+        {
+          works.map((entry) => (
+            <div class="works-grid__cell" data-category={entry.data.category}>
+              <ProductPlate entry={entry} lang={lang} />
+            </div>
+          ))
+        }
+      </div>
+
+      <p class="empty" data-empty hidden>{t('works.empty')}</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines gold />
+  </div>
+</Base>
+
+<script is:inline>
+  const chips = document.querySelectorAll('[data-filter]');
+  const cells = document.querySelectorAll('[data-grid] > [data-category]');
+  const counter = document.querySelector('[data-count]');
+  const empty = document.querySelector('[data-empty]');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const f = chip.dataset.filter;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      let visible = 0;
+      cells.forEach((cell) => {
+        const show = f === 'all' || cell.dataset.category === f;
+        cell.hidden = !show;
+        if (show) visible++;
+      });
+      if (counter) counter.textContent = String(visible);
+      if (empty) empty.hidden = visible > 0;
+    });
+  });
+</script>
+
+<style>
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: clamp(1.8rem, 4vw, 2.8rem);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+  .count {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--muted);
+  }
+
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: clamp(1.4rem, 3vw, 2.4rem);
+    align-items: stretch;
+  }
+  .works-grid__cell {
+    grid-column: span 12;
+    height: 100%;
+  }
+  @media (min-width: 760px) {
+    .works-grid__cell:nth-child(4n + 1) {
+      grid-column: span 7;
+    }
+    .works-grid__cell:nth-child(4n + 2) {
+      grid-column: span 5;
+    }
+    .works-grid__cell:nth-child(4n + 3) {
+      grid-column: span 5;
+    }
+    .works-grid__cell:nth-child(4n + 4) {
+      grid-column: span 7;
+    }
+  }
+
+  .empty {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--muted);
+    padding-block: 2.5rem;
+  }
+</style>

@@ -1,0 +1,24 @@
+---
+/**
+ * Layer lines — il divisore strutturale del sito.
+ * `gold`: una delle linee è in Silk Gold.
+ * `hero`: le linee si "stendono" al caricamento della home.
+ * `onDark`: versione per fondi Nozzle Ink.
+ */
+interface Props {
+  gold?: boolean;
+  hero?: boolean;
+  onDark?: boolean;
+}
+const { gold = false, hero = false, onDark = false } = Astro.props;
+---
+
+<div
+  class:list={['layers', { 'layers--gold': gold, 'layers--on-dark': onDark }]}
+  aria-hidden="true"
+>
+  <i class:list={[{ 'anim-laydown': hero }]}></i>
+  <i class:list={[{ 'anim-laydown': hero }]}></i>
+  <i class:list={[{ 'anim-laydown': hero }]}></i>
+  <i class:list={[{ 'anim-laydown': hero }]}></i>
+</div>

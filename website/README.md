@@ -1,16 +1,60 @@
-# React + Vite
+# Double LayeR Prints — sito
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sito statico in [Astro](https://astro.build), bilingue IT/EN, deployato su GitHub Pages:
+**https://tancredibosi.github.io/doublelayer**
 
-Currently, two official plugins are available:
+## Comandi
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install        # una volta sola
+npm run dev        # dev server → http://localhost:4321/doublelayer
+npm run build      # build di produzione in dist/
+npm run preview    # prova la build
+npm run placeholders  # rigenera le immagini placeholder dei pezzi
+```
 
-## React Compiler
+## Aggiungere un pezzo alla galleria
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Metti le foto in `public/images/works/` (consigliato: 2–3 per pezzo, le prime in formato 4:3).
+2. Crea due file in `src/content/works/`:
+   - `mio-pezzo.it.md` (versione italiana)
+   - `mio-pezzo.en.md` (versione inglese)
+   con lo stesso nome base. Frontmatter di riferimento (copia da un file esistente):
+   `title, category (figures|home|tools|art), materials, dimensions, layerHeight, weight, printTime, photos[], alt, featured, order`.
+3. `featured: true` lo fa apparire tra i "Lavori selezionati" in home. `order` decide l'ordine in galleria.
+4. Riferimenti al pezzo: `lavori/mio-pezzo` in italiano, `en/works/mio-pezzo` in inglese.
 
-## Expanding the ESLint configuration
+## Dove si cambia cosa
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Cosa | File |
+|---|---|
+| Instagram, email, numero WhatsApp | `src/consts.ts` |
+| Testi dell'interfaccia (IT/EN) | `src/i18n/ui.ts` |
+| Storia "Chi siamo" | `src/components/pages/AboutPage.astro` |
+| Colori, font, spaziature | `src/styles/global.css` (sezione Token) |
+| Stampanti | `src/consts.ts` (`PRINTERS`) |
+
+I contatti attuali (handle Instagram, email, numero WhatsApp) sono **placeholder**: sostituirli in `src/consts.ts`.
+
+## Foto vere
+
+Le immagini dei pezzi sono placeholder SVG generati (`npm run placeholders`).
+Quando arrivate le foto custom, basta salvarle in `public/images/works/` con lo stesso
+nome del file referenziato nei `.md` (es. `dragon-bust-1.jpg`) e aggiornare i path
+nei frontmatter. La foto del laboratorio: `public/images/studio.jpg` è
+l'originale full-res, `public/images/studio-16.jpg` (1600px) è la versione
+compressa usata dal sito (rigenerabile con
+`sips -Z 1600 -s format jpeg -s formatOptions 72`): quando aggiorni la foto,
+aggiorna **entrambi** i file.
+
+## Font
+
+Self-hosted in `public/fonts/` (Clash Display e Satoshi da Fontshare, Space Mono da
+Google Fonts). Se cambi `base` in `astro.config.mjs`, aggiorna anche i path
+`/doublelayer/fonts/...` in `src/styles/global.css` e i preload in `src/layouts/Base.astro`.
+
+## Deploy
+
+Su ogni push su `main`, GitHub Actions builda e pubblica (`.github/workflows/deploy.yml`
+nella root del repo). La prima volta: nelle impostazioni del repo → Pages → Source =
+"GitHub Actions".

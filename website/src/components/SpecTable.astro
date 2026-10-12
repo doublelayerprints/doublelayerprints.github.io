@@ -1,0 +1,59 @@
+---
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'works'>;
+  lang: Lang;
+}
+const { entry, lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+const rows: Array<[UIKey, string]> = [
+  ['spec.material', entry.data.materials],
+  ['spec.dimensions', entry.data.dimensions],
+  ['spec.layer', entry.data.layerHeight],
+  ['spec.weight', entry.data.weight],
+  ['spec.time', entry.data.printTime],
+];
+---
+
+<dl class="specs">
+  {
+    rows.map(([key, value]) => (
+      <div class="specs__row">
+        <dt>{t(key)}</dt>
+        <dd>{value}</dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .specs {
+    border-top: 2px solid var(--purple);
+  }
+
+  .specs__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2rem;
+    padding-block: 0.78rem;
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .specs__row dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  .specs__row dd {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--ink);
+    text-align: right;
+  }
+</style>

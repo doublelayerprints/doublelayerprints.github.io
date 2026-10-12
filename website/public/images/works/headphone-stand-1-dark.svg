@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img">
+<rect width="1200" height="900" fill="#211a2e"/>
+<rect x="-80.0" y="0.0" width="1360" height="37.6" fill="#4d3f68"/>
+<rect x="-80.0" y="49.5" width="1360" height="152.4" fill="#4d3f68"/>
+<rect x="-132.0" y="215.4" width="1360" height="66.6" fill="#2b2337"/>
+<rect x="-80.0" y="290.1" width="1360" height="137.1" fill="#2b2337"/>
+<rect x="-80.0" y="435.7" width="1360" height="76.9" fill="#4d3f68"/>
+<rect x="-80.0" y="469.6" width="1360" height="9.2" fill="#ffce00"/>
+<rect x="-80.0" y="527.5" width="1360" height="42.6" fill="#6b4fa4"/>
+<rect x="-80.0" y="583.1" width="1360" height="125.1" fill="#2b2337"/>
+<rect x="-80.0" y="713.4" width="1360" height="122.8" fill="#2b2337"/>
+<text x="48" y="856" font-family="'Space Mono', ui-monospace, monospace" font-size="22" letter-spacing="1" fill="#cfc9da" opacity="0.5">headphone-stand · layer 0.2 mm</text>
+</svg>

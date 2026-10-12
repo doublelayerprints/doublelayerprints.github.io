@@ -1,0 +1,178 @@
+---
+import Base from '../../layouts/Base.astro';
+import LayerLines from '../LayerLines.astro';
+import PageRail from '../PageRail.astro';
+import { ui, type UIKey, type Lang } from '../../i18n/ui';
+import { pathFor, asset } from '../../i18n/utils';
+import { PRINTERS, SITE, whatsappLink } from '../../consts';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+
+const story =
+  lang === 'it'
+    ? [
+        'Siamo Tancredi e Rachele, e Double LayeR Prints è il nostro laboratorio di stampa 3D. Tutto è iniziato con una stampante, un salotto pieno di bobine e l\u2019idea che gli oggetti si costruiscano uno strato alla volta — esattamente come è cresciuto questo progetto.',
+        'Oggi nel laboratorio lavorano due stampanti in parallelo. Tancredi si occupa dei modelli, dei firmware e dello slicing; Rachele sceglie i filamenti, i colori e le finiture. Ogni pezzo che pubblichiamo è progettato, stampato e controllato da tutti e due: se non piace a entrambi, non esce dal laboratorio.',
+        'Il nome è già il programma: la stampa 3D costruisce per strati, e noi siamo due strati dello stesso oggetto. Non vendiamo un catalogo — mostriamo quello che sappiamo fare, un pezzo alla volta.',
+      ]
+    : [
+        'We are Tancredi and Rachele, and Double LayeR Prints is our 3D printing workshop. It all started with one printer, a living room full of spools, and the idea that objects are built one layer at a time — exactly how this project grew.',
+        'Today two printers work side by side in the workshop. Tancredi takes care of models, firmware and slicing; Rachele picks filaments, colors and finishes. Every piece we publish is designed, printed and checked by both of us: if we don\u2019t both like it, it doesn\u2019t leave the workshop.',
+        'The name is the program: 3D printing builds in layers, and we are two layers of the same object. We don\u2019t sell a catalog — we show what we can make, one piece at a time.',
+      ];
+
+const photoAlt =
+  lang === 'it'
+    ? 'Il laboratorio: due stampanti 3D, una Anycubic Kobra 3 e una Anycubic Kobra X, con le bobine di filamento'
+    : 'The workshop: two 3D printers, an Anycubic Kobra 3 and an Anycubic Kobra X, with filament spools';
+---
+
+<Base lang={lang} canonical="chi-siamo" title={`${t('about.title')} · ${SITE.name}`}>
+  <PageRail
+    lang={lang}
+    sections={[
+      { id: 'storia', label: 'rail.about' },
+      { id: 'stampanti', label: 'rail.printers' },
+      { id: 'parliamone', label: 'rail.talk' },
+    ]}
+  />
+  <section class="section" id="storia">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-eyebrow">{t('about.eyebrow')}</span>
+        <h1 class="section-title">{t('about.title')}</h1>
+      </div>
+
+      <div class="about">
+        <div class="about__story prose">
+          <p class="about__lead">{story[0]}</p>
+          {story.slice(1).map((p) => <p>{p}</p>)}
+        </div>
+
+        <figure class="about__photo">
+          <img
+            src={asset('images/studio-16.jpg')}
+            alt={photoAlt}
+            width="1600"
+            height="1200"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines />
+  </div>
+
+  <section class="section" id="stampanti">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">{t('about.printers.title')}</h2>
+      </div>
+      <ol class="printers">
+        {
+          PRINTERS.map((p, idx) => (
+            <li class="printer">
+              <span class="printer__num" aria-hidden="true">{String(idx + 1).padStart(2, '0')}</span>
+              <h3 class="printer__model">{p.model}</h3>
+              <p class="printer__type">{p.type[lang]}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines gold />
+  </div>
+
+  <section class="section" id="parliamone">
+    <div class="container band">
+      <div class="band__text">
+        <h2 class="section-title">{t('contact.title')}</h2>
+        <p class="section-intro">{t('contact.intro')}</p>
+      </div>
+      <div class="band__cta">
+        <a class="btn btn--solid" href={whatsappLink(t('contact.whatsappPrefill'))} target="_blank" rel="noopener">
+          {t('contact.wa.action')}
+        </a>
+        <a class="btn" href={pathFor('lavori', lang)}>{t('about.cta')}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .about__lead {
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .about__story p + p {
+    margin-top: 1.1em;
+    color: var(--ink-soft);
+  }
+  .about__photo {
+    border: 1px solid var(--line-dark);
+    background: var(--paper-dim);
+    padding: 0.55rem;
+  }
+  .about__photo img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  @media (max-width: 960px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .printers {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.4rem, 3vw, 2.4rem);
+  }
+  .printer {
+    border-top: 1px solid var(--line-dark);
+    padding-top: 1.1rem;
+  }
+  .printer__num {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--purple-text);
+  }
+  .printer__model {
+    font-size: var(--text-lg);
+    margin-top: 0.4rem;
+  }
+  .printer__type {
+    margin-top: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--muted);
+  }
+  @media (max-width: 640px) {
+    .printers {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

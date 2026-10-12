@@ -1,0 +1,145 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { pathFor, asset } from '../i18n/utils';
+import { ui, type Lang } from '../i18n/ui';
+import { SITE } from '../consts';
+
+interface Props {
+  lang: Lang;
+  /** Rotta canonica IT, senza base né prefisso lingua: '' | 'lavori' | 'lavori/slug' | … */
+  canonical: string;
+  title?: string;
+  description?: string;
+}
+
+const { lang, canonical } = Astro.props;
+const t = (key: keyof (typeof ui)['it']): string => ui[lang][key];
+const pageTitle = Astro.props.title ?? t('site.title');
+const description = Astro.props.description ?? t('site.description');
+
+const site = Astro.site ?? new URL('https://tancredibosi.github.io');
+const canonicalUrl = new URL(pathFor(canonical, lang), site);
+const itUrl = new URL(pathFor(canonical, 'it'), site);
+const enUrl = new URL(pathFor(canonical, 'en'), site);
+const ogImage = new URL(asset('og.png'), site);
+const homeUrl = new URL(pathFor('', lang), site);
+const logoUrl = new URL(asset('logo.png'), site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${homeUrl}#organization`,
+      name: SITE.name,
+      url: homeUrl.toString(),
+      logo: logoUrl.toString(),
+      founder: [
+        { '@type': 'Person', name: 'Tancredi' },
+        { '@type': 'Person', name: 'Rachele' },
+      ],
+      sameAs: [SITE.instagram.url],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${homeUrl}#website`,
+      name: SITE.name,
+      url: homeUrl.toString(),
+      inLanguage: ['it', 'en'],
+      publisher: {
+        '@id': `${homeUrl}#organization`,
+      },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eff0f2" data-theme-color />
+
+    <!-- Tema: no-flash — decide prima del paint se serve Notturno.
+         Precedenza: scelta esplicita dell'utente > preferenza di sistema. -->
+    <script is:inline>
+      (function () {
+        var theme = 'light';
+        try {
+          var saved = localStorage.getItem('dl-theme');
+          if (saved === 'light' || saved === 'dark') {
+            theme = saved;
+          } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+        } catch (e) {}
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        var meta = document.querySelector('meta[data-theme-color]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#191322' : '#eff0f2');
+      })();
+    </script>
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="it" href={itUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={itUrl} />
+
+    <link rel="icon" type="image/svg+xml" href={asset('favicon.svg')} />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={asset('fonts/clash-display-600.woff2')}
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={asset('fonts/satoshi-400.woff2')}
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={asset('fonts/space-mono-400.woff2')}
+      crossorigin
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={lang === 'it' ? 'it_IT' : 'en_US'} />
+    <meta property="og:image:alt" content={SITE.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={SITE.name} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('nav.skip')}</a>
+    <Nav lang={lang} canonical={canonical} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

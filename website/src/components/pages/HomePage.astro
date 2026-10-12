@@ -1,0 +1,339 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Wordmark from '../Wordmark.astro';
+import GCodeStrip from '../GCodeStrip.astro';
+import LayerLines from '../LayerLines.astro';
+import PageRail from '../PageRail.astro';
+import ProductPlate from '../ProductPlate.astro';
+import { ui, type UIKey, type Lang } from '../../i18n/ui';
+import { pathFor, asset } from '../../i18n/utils';
+import { whatsappLink } from '../../consts';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+
+const works = (await getCollection('works'))
+  .filter((e) => e.id.endsWith(`.${lang}`))
+  .sort((a, b) => a.data.order - b.data.order);
+const featured = works.filter((e) => e.data.featured).slice(0, 4);
+
+const steps = [1, 2, 3] as const;
+const stepKey = (i: number, part: 'title' | 'text') =>
+  `process.${i}.${part}` as UIKey;
+---
+
+<Base lang={lang} canonical="">
+  <PageRail
+    lang={lang}
+    sections={[
+      { id: 'intro', label: 'rail.intro' },
+      { id: 'selected', label: 'rail.selected' },
+      { id: 'process', label: 'rail.process' },
+      { id: 'duo', label: 'rail.duo' },
+      { id: 'parliamone', label: 'rail.talk' },
+    ]}
+  />
+  <!-- ================= Hero ================= -->
+  <section class="hero" id="intro">
+    <div class="container hero__grid">
+      <GCodeStrip />
+      <div class="hero__text">
+        <Wordmark size="hero" />
+        <p class="hero__tagline anim-rise">{t('hero.tagline')}</p>
+        <div class="hero__cta anim-rise-late">
+          <a class="btn btn--solid" href={pathFor('lavori', lang)}>{t('hero.cta.works')}</a>
+          <a class="btn" href={pathFor('contatti', lang)}>{t('hero.cta.contact')}</a>
+        </div>
+      </div>
+      <figure class="hero__photo">
+        <img
+          src={asset('images/studio-16.jpg')}
+          alt={t('hero.photoAlt')}
+          width="1600"
+          height="1200"
+          fetchpriority="high"
+          decoding="async"
+        />
+        <figcaption class="hero__caption">{t('hero.photoCaption')}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines hero />
+  </div>
+
+  <!-- ================= Lavori selezionati ================= -->
+  <section class="section" id="selected">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">{t('home.selected.title')}</h2>
+        <p class="section-intro">{t('home.selected.intro')}</p>
+      </div>
+      <div class="works-grid">
+        {featured.map((entry) => <div class="works-grid__cell"><ProductPlate entry={entry} lang={lang} /></div>)}
+      </div>
+      <div class="works-more">
+        <a class="btn" href={pathFor('lavori', lang)}>{t('home.selected.all')}</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines gold />
+  </div>
+
+  <!-- ================= Processo ================= -->
+  <section class="section" id="process">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">{t('process.title')}</h2>
+      </div>
+      <ol class="process">
+        {
+          steps.map((i) => (
+            <li class="process__step">
+              <span class="process__num" aria-hidden="true">{String(i).padStart(2, '0')}</span>
+              <h3 class="process__title">{t(stepKey(i, 'title'))}</h3>
+              <p class="process__text">{t(stepKey(i, 'text'))}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines />
+  </div>
+
+  <!-- ================= About teaser ================= -->
+  <section class="section" id="duo">
+    <div class="container teaser">
+      <div class="teaser__text">
+        <h2 class="section-title">{t('home.about.title')}</h2>
+        <p class="section-intro teaser__p">{t('home.about.text')}</p>
+        <a class="link teaser__link" href={pathFor('chi-siamo', lang)}>
+          {t('home.about.cta')}
+        </a>
+      </div>
+      <div class="teaser__plates" role="group" aria-label="Tancredi e Rachele">
+        <div class="duo duo--t">
+          <span class="duo__echo" aria-hidden="true">T</span>
+          <span class="duo__ink" aria-hidden="true">T</span>
+        </div>
+        <div class="duo duo--r">
+          <span class="duo__echo" aria-hidden="true">R</span>
+          <span class="duo__ink" aria-hidden="true">R</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines gold />
+  </div>
+
+  <!-- ================= Banda contatti ================= -->
+  <section class="section" id="parliamone">
+    <div class="container band">
+      <div class="band__text">
+        <h2 class="section-title">{t('contact.title')}</h2>
+        <p class="section-intro">{t('contact.intro')}</p>
+      </div>
+      <div class="band__cta">
+        <a class="btn btn--solid" href={whatsappLink(t('contact.whatsappPrefill'))} target="_blank" rel="noopener">
+          {t('contact.wa.action')}
+        </a>
+        <a class="btn" href={pathFor('contatti', lang)}>{t('nav.contact')}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(2.5rem, 6vw, 5rem);
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 1181px) {
+    .hero__text {
+      margin-left: 13.5rem; /* spazio per la colonna di G-code */
+    }
+  }
+  .hero__tagline {
+    margin-top: 2.2rem;
+    max-width: 44ch;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 2.4rem;
+  }
+
+  .hero__photo {
+    border: 1px solid var(--line-dark);
+    background: var(--paper-dim);
+    padding: 0.55rem;
+  }
+  .hero__photo img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .hero__caption {
+    padding-top: 0.75rem;
+    padding-bottom: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .hero__grid {
+      grid-template-columns: 1fr;
+      padding-top: clamp(3rem, 8vw, 4rem);
+    }
+    .hero__photo {
+      max-width: 34rem;
+    }
+  }
+
+  /* ---------- Griglia lavori (asimmetrica) ---------- */
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: clamp(1.4rem, 3vw, 2.4rem);
+    align-items: stretch;
+  }
+  .works-grid__cell {
+    grid-column: span 12;
+    height: 100%;
+  }
+  @media (min-width: 760px) {
+    .works-grid__cell:nth-child(4n + 1) {
+      grid-column: span 7;
+    }
+    .works-grid__cell:nth-child(4n + 2) {
+      grid-column: span 5;
+    }
+    .works-grid__cell:nth-child(4n + 3) {
+      grid-column: span 5;
+    }
+    .works-grid__cell:nth-child(4n + 4) {
+      grid-column: span 7;
+    }
+  }
+  .works-more {
+    margin-top: clamp(2rem, 5vw, 3rem);
+  }
+
+  /* ---------- Processo ---------- */
+  .process {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.6rem, 4vw, 3.5rem);
+  }
+  .process__step {
+    border-top: 1px solid var(--line-dark);
+    padding-top: 1.1rem;
+  }
+  .process__num {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--purple-text);
+  }
+  .process__title {
+    font-size: var(--text-lg);
+    margin-block: 0.55rem 0.5rem;
+  }
+  .process__text {
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  @media (max-width: 860px) {
+    .process {
+      grid-template-columns: 1fr;
+      gap: 1.8rem;
+    }
+  }
+
+  /* ---------- About teaser ---------- */
+  .teaser {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .teaser__p {
+    margin-top: 1.1rem;
+  }
+  .teaser__link {
+    display: inline-block;
+    margin-top: 1.9rem;
+    color: var(--purple-text);
+  }
+  .teaser__plates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1rem, 2.5vw, 1.6rem);
+  }
+  .duo {
+    position: relative;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(4.5rem, 9vw, 7rem);
+    line-height: 1;
+  }
+  .duo__ink {
+    position: relative;
+    color: var(--on-dark-text);
+  }
+  .duo__echo {
+    position: absolute;
+    color: var(--gold);
+    transform: translate(0.09em, 0.06em);
+    z-index: 0;
+  }
+  /* piatti colorati: costanti nei due temi, come oggetti stampati */
+  .duo--t {
+    background: #241a30;
+    border: 1px solid var(--line-dark);
+  }
+  .duo--r {
+    background: #5b2e91;
+  }
+  @media (max-width: 900px) {
+    .teaser {
+      grid-template-columns: 1fr;
+    }
+    .teaser__plates {
+      max-width: 24rem;
+    }
+  }
+</style>

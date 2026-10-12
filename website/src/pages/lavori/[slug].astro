@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import WorkDetailPage from '../../components/pages/WorkDetailPage.astro';
+
+export async function getStaticPaths() {
+  const entries = (await getCollection('works')).filter((e) => e.id.endsWith('.it'));
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/\.it$/, '') },
+    props: { entry },
+  }));
+}
+const { entry } = Astro.props;
+---
+
+<WorkDetailPage entry={entry} lang="it" />

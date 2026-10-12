@@ -1,0 +1,423 @@
+---
+/**
+ * Il piano di stampa: rail laterale (solo ≥1280px) con l'indice delle sezioni
+ * della pagina e il progresso dello scorrimento. La pagina è l'oggetto, la rail
+ * è il file di slicing: ogni strato è una sezione (altezza proporzionale
+ * all'apporto reale sulla pagina), la testa di stampa in oro è la posizione
+ * di lettura. Al 100% lo stato diventa "; PRINT COMPLETE", l'eco del colophon.
+ * Funziona senza JS (anchor + stati equidistanti); con JS misura, mappa e
+ * segna lo strato attivo.
+ */
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  sections: Array<{ id: string; label: UIKey }>;
+}
+const { lang, sections } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+const items = sections.map((s, i) => ({
+  id: s.id,
+  num: String(i + 1).padStart(2, '0'),
+  label: t(s.label),
+}));
+---
+
+<nav class="rail" data-rail aria-label={t('rail.aria')}>
+  <div class="rail__track" data-rail-track>
+    {
+      items.map((it) => (
+        <a
+          class="rail__seg"
+          href={`#${it.id}`}
+          data-rail-seg
+          aria-label={`${it.num} — ${it.label}`}
+        />
+      ))
+      /* L'indice mobile: colonna indipendente nel track. I titoli viaggiano
+         sincronizzati alla pagina (posizione assegnata via JS in render). */
+    }
+    {
+      items.map((it) => (
+        <span class="rail__label" aria-hidden="true" data-label-id={it.num}>
+          <span class="rail__num">{it.num}</span>
+          <span class="rail__slash">/</span>
+          <span class="rail__name">{it.label}</span>
+        </span>
+      ))
+    }
+    <i class="rail__head" data-rail-head aria-hidden="true"></i>
+  </div>
+  <p class="rail__status" aria-hidden="true">
+    <span data-rail-pct>0%</span>
+    <span class="rail__done">{t('footer.colophonCode')}</span>
+  </p>
+</nav>
+
+<style>
+  .rail {
+    position: fixed;
+    top: 4rem; /* sotto la nav sticky */
+    bottom: 0;
+    right: 10px;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-bottom: 10px;
+  }
+  @media (max-width: 1279px) {
+    .rail {
+      display: none;
+    }
+  }
+
+  /* Il traccia: 16px di area cliccabile, il tratto visivo è a destra */
+  .rail__track {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* se cambia, aggiorna GAP nello script */
+    flex: 1 1 auto;
+    min-height: 280px;
+    width: 16px;
+  }
+
+  .rail__seg {
+    position: relative;
+    display: block;
+    width: 100%;
+    flex: 1 1 0; /* senza JS: strati equidistanti */
+    min-height: 12px;
+  }
+
+  .rail__seg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 100%;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--line-dark) 0 3px,
+      transparent 3px 6.5px
+    );
+    transition: width 0.18s var(--ease-lay);
+  }
+  .rail__seg:hover::before,
+  .rail__seg:focus-visible::before {
+    width: 14px;
+  }
+  .rail__seg[data-state-past]::before {
+    background: repeating-linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--purple-text) 62%, transparent) 0 3px,
+      transparent 3px 6.5px
+    );
+  }
+  .rail__seg[data-state-active]::before {
+    background: color-mix(in srgb, var(--purple-text) 42%, transparent);
+    width: 12px;
+  }
+
+  /* I tick: una hairline per strato, come le marcature dello slicer */
+  .rail__seg::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 13px;
+    width: 12px;
+    height: 1px;
+    background: var(--line-dark);
+  }
+  .rail__seg[data-state-past]::after {
+    background: color-mix(in srgb, var(--purple-text) 55%, transparent);
+  }
+  .rail__seg[data-state-active]::after {
+    background: var(--gold);
+    width: 16px;
+  }
+
+  /* La testa di stampa: posizione assegnata via JS */
+  .rail__head {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 3px;
+    margin-top: -1.5px;
+    background: var(--gold);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .rail__label {
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 0; /* assegnata via JS: carosello, trasla solo al cambio sezione */
+    opacity: var(--lo, 0); /* senza JS restano nascoste */
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--muted);
+    pointer-events: none;
+    transition:
+      top 0.5s var(--ease-lay),
+      opacity 0.28s ease;
+  }
+  .rail__num {
+    font-weight: 700;
+  }
+  .rail__slash {
+    color: var(--line-dark);
+  }
+  .rail__name {
+    color: var(--muted);
+  }
+  .rail__label[data-hot] .rail__num {
+    color: var(--purple-text);
+    font-weight: 700;
+  }
+  .rail__label[data-hot] .rail__name {
+    color: var(--ink);
+  }
+  .rail__label[data-active] .rail__num {
+    color: var(--purple-text);
+    font-weight: 700;
+  }
+  .rail__label[data-active] .rail__name {
+    color: var(--ink);
+  }
+  .rail__seg:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* Stato di stampa: percentuale che diventa "; PRINT COMPLETE" al fondo pagina */
+  .rail__status {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-align: right;
+    color: var(--muted);
+    visibility: hidden; /* vive solo col JS attivo */
+  }
+  .rail[data-live='true'] .rail__status {
+    visibility: visible;
+  }
+  .rail__done {
+    display: none;
+    color: var(--purple-text);
+  }
+  .rail[data-complete='true'] [data-rail-pct] {
+    display: none;
+  }
+  .rail[data-complete='true'] .rail__done {
+    display: inline;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const init = function () {
+      const rail = document.querySelector('[data-rail]');
+      if (!rail) return;
+      const track = rail.querySelector('[data-rail-track]');
+      const head = rail.querySelector('[data-rail-head]');
+      const pct = rail.querySelector('[data-rail-pct]');
+      if (!track || !head) return;
+
+      const GAP = 4; /* stesso valore del gap CSS */
+      const PAD = 0.45; /* una sezione diventa attiva quando il suo top risale al 45% della viewport */
+      const segs = Array.prototype.slice.call(track.querySelectorAll('[data-rail-seg]'));
+      const labelEls = Array.prototype.slice.call(track.querySelectorAll('.rail__label'));
+      const sections = segs
+        .map(function (s) {
+          const href = s.getAttribute('href') || '';
+          return document.getElementById(href.slice(1));
+        })
+        .filter(Boolean);
+      if (!sections.length || sections.length !== segs.length) return;
+
+      let max = 1;
+      let trackH = 1;
+      let docTops = []; /* offsetTop reali, per l'indice mobile */
+      let labelH = 18;
+
+      const measure = function () {
+        const winH = window.innerHeight;
+        max = Math.max(1, document.documentElement.scrollHeight - winH);
+        trackH = track.clientHeight;
+        docTops = sections.map(function (el) {
+          return el.getBoundingClientRect().top + window.scrollY;
+        });
+        if (labelEls[0]) {
+          const lh = labelEls[0].getBoundingClientRect().height;
+          labelH = lh > 4 ? lh : 18;
+        }
+        const tops = docTops.map(function (t) {
+          return t - winH * PAD;
+        });
+        const clamp = function (v) {
+          return Math.min(Math.max(v, 0), max);
+        };
+        const bounds = [0];
+        tops.slice(1).forEach(function (t) {
+          bounds.push(clamp(t));
+        });
+        bounds.push(max);
+        for (let i = 1; i < bounds.length; i++) {
+          if (bounds[i] <= bounds[i - 1]) bounds[i] = bounds[i - 1] + 1;
+        }
+        bounds[bounds.length - 1] = Math.max(
+          bounds[bounds.length - 1],
+          bounds[bounds.length - 2] + 1,
+        );
+        const usable = Math.max(0, trackH - GAP * (segs.length - 1));
+        segs.forEach(function (seg, i) {
+          const a = bounds[i];
+          const b = bounds[i + 1];
+          const h = Math.max(10, ((b - a) / max) * usable);
+          seg.style.height = h.toFixed(1) + 'px';
+          seg.style.flex = '0 0 auto';
+          seg.dataset.lo = String(Math.round(a));
+        });
+      };
+
+      const render = function () {
+        const y = Math.min(max, Math.max(0, window.scrollY));
+        const p = y / max;
+        let active = 0;
+        segs.forEach(function (seg, i) {
+          if (y >= Number(seg.dataset.lo || 0)) active = i;
+        });
+        segs.forEach(function (seg, i) {
+          seg.toggleAttribute('data-state-past', i < active);
+          seg.toggleAttribute('data-state-active', i === active);
+          if (labelEls[i]) labelEls[i].toggleAttribute('data-active', i === active);
+        });
+        head.style.transform = 'translateY(' + (p * (trackH - 3)).toFixed(1) + 'px)';
+        if (pct) {
+          pct.textContent = String(Math.round(p * 100)).padStart(3, '0') + '%';
+        }
+        rail.setAttribute('data-complete', p > 0.995 ? 'true' : 'false');
+
+        /* L'indice carosello: tre slot fissi lungo la rail (sopra / centro /
+           sotto). I titoli restano fermi; quando cambia la sezione attiva
+           l'intera colonna trasla di uno slot, come nel riferimento. */
+        const prevActiveRaw = Number(rail.dataset.activeIdx || 0);
+        if (prevActiveRaw !== active) {
+          rail.dataset.activeIdx = String(active);
+        }
+        const H = trackH;
+        const slotTop = -24; /* sopra l'orlo superiore */
+        const slotMid = Math.round(H / 2 - labelH / 2);
+        const slotBot = H + 24;
+        const dir = active >= prevActiveRaw ? 1 : -1;
+        for (let i = 0; i < segs.length; i++) {
+          const l = labelEls[i];
+          if (!l) continue;
+          const d = i - active; /* -2 -1 0 +1 +2 … */
+          let top;
+          let lo;
+          if (d === 0) {
+            top = slotMid;
+            lo = 1;
+          } else if (d === -1) {
+            top = slotTop;
+            lo = 0.42;
+          } else if (d === 1) {
+            top = slotBot;
+            lo = 0.42;
+          } else if (d < -1) {
+            top = slotTop - (slotMid - slotTop); /* oltre l'orlo, nascosto */
+            lo = 0;
+          } else {
+            top = slotBot + (slotBot - slotMid);
+            lo = 0;
+          }
+          if (l.dataset.hot === '1') lo = 1;
+          l.style.top = top + 'px';
+          l.style.setProperty('--lo', String(lo));
+        }
+      };
+
+      let ticking = false;
+      const scheduleRender = function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          ticking = false;
+          render();
+        });
+      };
+      const onResize = function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          ticking = false;
+          measure();
+          render();
+        });
+      };
+      const refresh = function () {
+        measure();
+        render();
+      };
+
+      rail.setAttribute('data-live', 'true');
+      rail.setAttribute('data-complete', 'false');
+      refresh();
+      // La measure è sensibile ai timing di load (CSS/fonte/re-layout): la
+      // ripetiamo ai punti garantiti oltre a init.
+      requestAnimationFrame(function () {
+        refresh();
+      });
+      window.addEventListener('load', refresh);
+      window.addEventListener('scroll', scheduleRender, { passive: true });
+      window.addEventListener('resize', onResize);
+      // Qualsiasi mutazione dell'altezza della pagina (filtri, immagini,
+      // font) ricalibra la mappa.
+      if (window.ResizeObserver) {
+        new ResizeObserver(onResize).observe(document.documentElement);
+      }
+      segs.forEach(function (seg, i) {
+        const bump = function () {
+          if (labelEls[i]) {
+            labelEls[i].dataset.hot = '1';
+            scheduleRender();
+          }
+        };
+        const drop = function () {
+          if (labelEls[i]) {
+            delete labelEls[i].dataset.hot;
+            scheduleRender();
+          }
+        };
+        seg.addEventListener('mouseenter', bump);
+        seg.addEventListener('mouseleave', drop);
+        seg.addEventListener('focusin', bump);
+        seg.addEventListener('focusout', drop);
+      });
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(refresh);
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

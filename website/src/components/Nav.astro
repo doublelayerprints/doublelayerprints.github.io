@@ -1,0 +1,344 @@
+---
+import { pathFor } from '../i18n/utils';
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+import NavTools from './NavTools.astro';
+
+interface Props {
+  lang: Lang;
+  canonical: string;
+}
+const { lang, canonical } = Astro.props;
+const other: Lang = lang === 'it' ? 'en' : 'it';
+const t = (key: UIKey): string => ui[lang][key];
+const links = [
+  { route: 'lavori', label: t('nav.works') },
+  { route: 'chi-siamo', label: t('nav.about') },
+  { route: 'contatti', label: t('nav.contact') },
+];
+const isCurrent = (route: string) =>
+  canonical === route || canonical.startsWith(`${route}/`);
+---
+
+<header class="nav">
+  <div class="container nav__inner">
+    <a class="nav__brand" href={pathFor('', lang)}>
+      <span class="nav__brand-a">Double</span>
+      <span class="nav__brand-b">LayeR</span>
+      <span class="nav__brand-sub">prints</span>
+    </a>
+
+    <div class="nav__cluster">
+      <nav class="nav__links" aria-label={lang === 'it' ? 'Menu principale' : 'Main menu'}>
+        {
+          links.map((l) => (
+            <a
+              href={pathFor(l.route, lang)}
+              aria-current={isCurrent(l.route) ? 'page' : undefined}
+            >
+              {l.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <span class="nav__sep" aria-hidden="true"></span>
+
+      <NavTools lang={lang} canonical={canonical} other={other} />
+    </div>
+
+    <button
+      class="nav__toggle"
+      data-menu-btn
+      data-label-open={t('nav.openMenu')}
+      data-label-close={t('nav.closeMenu')}
+      aria-expanded="false"
+      aria-controls="menu-panel"
+      aria-label={t('nav.openMenu')}
+    >
+      <i></i>
+      <i></i>
+      <i></i>
+    </button>
+  </div>
+
+  <div class="nav__panel" id="menu-panel" hidden>
+    <nav class="container nav__panel-links" aria-label={lang === 'it' ? 'Menu principale' : 'Main menu'}>
+      {
+        links.map((l) => (
+          <a
+            href={pathFor(l.route, lang)}
+            aria-current={isCurrent(l.route) ? 'page' : undefined}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+      <div class="nav__panel-footer">
+        <span class="nav__panel-label">{t('nav.themeLang')}</span>
+        <NavTools lang={lang} canonical={canonical} other={other} />
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  const btn = document.querySelector('[data-menu-btn]');
+  const panel = document.querySelector('#menu-panel');
+  if (btn && panel) {
+    const setOpen = (open) => {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute(
+        'aria-label',
+        open ? btn.dataset.labelClose : btn.dataset.labelOpen,
+      );
+      panel.hidden = !open;
+    };
+    btn.addEventListener('click', () => {
+      setOpen(btn.getAttribute('aria-expanded') !== 'true');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+  }
+
+  // Tema: chiaro (default) / Notturno. Precedenza: scelta dell'utente > sistema.
+  const themeBtns = document.querySelectorAll('[data-theme-btn]');
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const currentTheme = () => {
+    const attr = document.documentElement.getAttribute('data-theme');
+    if (attr === 'dark' || attr === 'light') return attr;
+    return systemDark.matches ? 'dark' : 'light';
+  };
+  const applyTheme = (theme, persist) => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (persist) {
+      try {
+        localStorage.setItem('dl-theme', theme);
+      } catch (e) {}
+    }
+    themeBtns.forEach((b) => {
+      b.setAttribute('aria-pressed', String(theme === 'dark'));
+      b.setAttribute(
+        'aria-label',
+        theme === 'dark' ? b.dataset.labelLight : b.dataset.labelDark,
+      );
+    });
+    const meta = document.querySelector('meta[data-theme-color]');
+    if (meta)
+      meta.setAttribute('content', theme === 'dark' ? '#191322' : '#eff0f2');
+  };
+  themeBtns.forEach((b) => {
+    b.addEventListener('click', () => {
+      applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+    });
+  });
+  applyTheme(currentTheme(), false);
+  systemDark.addEventListener('change', (e) => {
+    let saved = null;
+    try {
+      saved = localStorage.getItem('dl-theme');
+    } catch (err) {}
+    if (saved !== 'light' && saved !== 'dark') {
+      applyTheme(e.matches ? 'dark' : 'light', false);
+    }
+  });
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-height: 4rem;
+    flex-wrap: nowrap;
+  }
+
+  /* Brand: mini wordmark */
+  .nav__brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.08rem;
+    letter-spacing: -0.01em;
+    margin-right: auto;
+    text-decoration: none;
+    transition: opacity 0.16s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .nav__brand,
+  .nav__brand:hover,
+  .nav__brand:focus-visible,
+  .nav__brand span {
+    text-decoration: none;
+  }
+  .nav__brand:hover {
+    opacity: 0.85;
+  }
+  .nav__brand-a {
+    color: var(--purple-text);
+  }
+  .nav__brand-b {
+    color: var(--ink);
+  }
+  .nav__brand-sub {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.74rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Cluster destro desktop: links + separatore + tools */
+  .nav__cluster {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Link: underline a strato, scatta al passaggio */
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+  }
+  .nav__links a {
+    position: relative;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding-block: 0.35rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color 0.16s ease;
+  }
+  .nav__links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.18s ease;
+  }
+  .nav__links a:hover {
+    color: var(--ink);
+  }
+  .nav__links a:hover::after,
+  .nav__links a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  .nav__links a[aria-current='page'] {
+    color: var(--purple-text);
+  }
+
+  /* Separatore verticale di precisione */
+  .nav__sep {
+    display: block;
+    width: 1px;
+    height: 1.15rem;
+    background: var(--line-dark);
+  }
+
+  .nav__brand:focus-visible,
+  .nav__links a:focus-visible,
+  .nav__toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* Toggle mobile: tre layer che diventano una croce */
+  .nav__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0.5rem;
+    margin-right: -0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  .nav__toggle i {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--ink);
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+  .nav__toggle[aria-expanded='true'] i:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .nav__toggle[aria-expanded='true'] i:nth-child(2) {
+    opacity: 0;
+  }
+  .nav__toggle[aria-expanded='true'] i:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* Mobile panel */
+  .nav__panel {
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .nav__panel-links a {
+    display: block;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--line);
+    font-weight: 500;
+    font-size: 1.05rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .nav__panel-links a[aria-current='page'] {
+    color: var(--purple-text);
+    border-left: 3px solid var(--gold);
+    padding-left: 0.75rem;
+  }
+
+  .nav__panel-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 1rem;
+  }
+  .nav__panel-label {
+    font-size: var(--text-sm);
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 800px) {
+    .nav__cluster {
+      display: none;
+    }
+    .nav__toggle {
+      display: flex;
+    }
+  }
+  @media (min-width: 801px) {
+    .nav__panel {
+      display: none;
+    }
+  }
+</style>

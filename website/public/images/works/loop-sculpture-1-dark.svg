@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img">
+<rect width="1200" height="900" fill="#211a2e"/>
+<rect x="-80.0" y="0.0" width="1360" height="96.4" fill="#403756"/>
+<rect x="-80.0" y="100.9" width="1360" height="139.9" fill="#2b2337"/>
+<rect x="-28.0" y="255.0" width="1360" height="142.6" fill="#352d47"/>
+<rect x="-80.0" y="409.8" width="1360" height="68.6" fill="#2b2337"/>
+<rect x="-80.0" y="491.3" width="1360" height="150.8" fill="#2b2337"/>
+<rect x="-80.0" y="560.2" width="1360" height="13.1" fill="#ffce00"/>
+<rect x="-80.0" y="653.4" width="1360" height="92.6" fill="#6b4fa4"/>
+<rect x="-80.0" y="760.4" width="1360" height="101.4" fill="#4d3f68"/>
+<rect x="-80.0" y="868.8" width="1360" height="144.9" fill="#6b4fa4"/>
+<text x="48" y="856" font-family="'Space Mono', ui-monospace, monospace" font-size="22" letter-spacing="1" fill="#cfc9da" opacity="0.5">loop-sculpture · layer 0.2 mm</text>
+</svg>

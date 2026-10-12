@@ -1,0 +1,248 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageRail from '../PageRail.astro';
+import SpecTable from '../SpecTable.astro';
+import LayerLines from '../LayerLines.astro';
+import { ui, type UIKey, type Lang } from '../../i18n/ui';
+import { pathFor, asset } from '../../i18n/utils';
+import { SITE, whatsappLink } from '../../consts';
+
+interface Props {
+  entry: CollectionEntry<'works'>;
+  lang: Lang;
+}
+const { entry, lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+const slug = entry.id.replace(/\.(it|en)$/, '');
+const catKey = `cat.${entry.data.category}` as UIKey;
+const contentHtml = entry.rendered?.html ?? '';
+const firstParagraph = entry.body?.split('\n\n')[0]?.slice(0, 155) ?? '';
+const prefill = t('work.whatsappPrefill').replace('{title}', entry.data.title);
+const isPlaceholder = entry.data.photos[0].endsWith('.svg');
+const darkVariant = (p: string) => p.replace(/\.svg$/, '-dark.svg');
+---
+
+<Base
+  lang={lang}
+  canonical={`lavori/${slug}`}
+  title={`${entry.data.title} · ${SITE.name}`}
+  description={`${firstParagraph}…`}
+>
+  <PageRail
+    lang={lang}
+    sections={[
+      { id: 'pezzo', label: 'rail.piece' },
+      { id: 'specifiche', label: 'rail.specs' },
+      { id: 'parliamone', label: 'rail.talk' },
+    ]}
+  />
+  <section class="section" id="pezzo">
+    <div class="container">
+      <a class="link back" href={pathFor('lavori', lang)}>{t('work.back')}</a>
+
+      <div class="detail">
+        <div class="detail__photos">
+          <figure class="photo photo--main">
+            <img
+              class={isPlaceholder ? 'photo--light' : undefined}
+              src={asset(entry.data.photos[0])}
+              alt={entry.data.alt}
+              width="1200"
+              height="900"
+              decoding="async"
+            />
+            {
+              isPlaceholder && (
+                <img
+                  class="photo--dark"
+                  src={asset(darkVariant(entry.data.photos[0]))}
+                  alt={entry.data.alt}
+                  width="1200"
+                  height="900"
+                  decoding="async"
+                />
+              )
+            }
+          </figure>
+          {
+            entry.data.photos.length > 1 && (
+              <div class="detail__thumbs">
+                {entry.data.photos.slice(1).map((p) => (
+                  <div class="photo photo--thumb">
+                    <img
+                      class={isPlaceholder ? 'photo--light' : undefined}
+                      src={asset(p)}
+                      alt=""
+                      width="600"
+                      height="450"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    {isPlaceholder && (
+                      <img
+                        class="photo--dark"
+                        src={asset(darkVariant(p))}
+                        alt=""
+                        width="600"
+                        height="450"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          }
+          {isPlaceholder && <p class="placeholder-note">{t('work.photoPlaceholder')}</p>}
+        </div>
+
+        <div class="detail__info">
+          <p class="detail__cat">; {t(catKey).toUpperCase()}</p>
+          <h1 class="detail__title">{entry.data.title}</h1>
+          <div class="prose detail__desc" set:html={contentHtml} />
+
+          <div id="specifiche">
+            <p class="detail__specs-eyebrow" aria-hidden="true">; SLICER DATA</p>
+            <h2 class="detail__specs-title">{t('work.specs')}</h2>
+            <SpecTable entry={entry} lang={lang} />
+          </div>
+
+          <div class="detail__cta">
+            <a
+              class="btn btn--solid"
+              href={whatsappLink(prefill)}
+              target="_blank"
+              rel="noopener"
+            >
+              {t('work.cta')}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <LayerLines gold />
+  </div>
+
+  <section class="section" id="parliamone">
+    <div class="container band">
+      <div class="band__text">
+        <h2 class="section-title">{t('contact.title')}</h2>
+        <p class="section-intro">{t('contact.intro')}</p>
+      </div>
+      <div class="band__cta">
+        <a class="btn btn--solid" href={whatsappLink(prefill)} target="_blank" rel="noopener">
+          {t('contact.wa.action')}
+        </a>
+        <a class="btn" href={pathFor('contatti', lang)}>{t('nav.contact')}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .back {
+    font-size: var(--text-sm);
+    color: var(--muted);
+  }
+  .back:hover {
+    color: var(--ink);
+  }
+
+  .detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    margin-top: 1.8rem;
+  }
+  @media (max-width: 960px) {
+    .detail {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Foto: plate con bordo, come l'hero */
+  .photo--main {
+    border: 1px solid var(--line-dark);
+    background: var(--paper-dim);
+    padding: 0.55rem;
+  }
+  .photo--main img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .detail__thumbs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+  }
+  .photo--thumb {
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--line-dark);
+    padding: 0.3rem;
+    background: var(--paper-dim);
+  }
+  .photo--thumb img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  /* Placeholder doppia sorgente: variante Notturno degli SVG */
+  .photo--dark {
+    display: none;
+  }
+  :root[data-theme='dark'] .photo--light {
+    display: none;
+  }
+  :root[data-theme='dark'] .photo--dark {
+    display: block;
+  }
+
+  .placeholder-note {
+    margin-top: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+  }
+
+  .detail__cat {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--purple-text);
+  }
+  .detail__title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    margin-top: 0.5rem;
+  }
+  .detail__desc {
+    margin-top: 1.3rem;
+    color: var(--ink-soft);
+  }
+  .detail__specs-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--purple-text);
+    margin-top: 2.6rem;
+    margin-bottom: 0.35rem;
+  }
+  .detail__specs-title {
+    font-size: var(--text-lg);
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  .detail__cta {
+    margin-top: 2.2rem;
+  }
+</style>

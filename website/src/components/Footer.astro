@@ -1,0 +1,134 @@
+---
+import { pathFor } from '../i18n/utils';
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+import { SITE, whatsappLink } from '../consts';
+import Wordmark from './Wordmark.astro';
+import LayerLines from './LayerLines.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+const menuLinks = [
+  { route: 'lavori', label: t('nav.works') },
+  { route: 'chi-siamo', label: t('nav.about') },
+  { route: 'contatti', label: t('nav.contact') },
+];
+const prefill = t('contact.whatsappPrefill');
+---
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <Wordmark size="footer" onDark />
+      <p class="footer__tagline">{t('footer.tagline')}</p>
+    </div>
+
+    <nav class="footer__menu" aria-label={t('footer.menu')}>
+      <h2 class="footer__heading">{t('footer.menu')}</h2>
+      {menuLinks.map((l) => <a href={pathFor(l.route, lang)}>{l.label}</a>)}
+    </nav>
+
+    <div class="footer__contacts">
+      <h2 class="footer__heading">{t('footer.contacts')}</h2>
+      <a href={SITE.instagram.url} target="_blank" rel="me noopener">
+        @{SITE.instagram.handle}
+      </a>
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      <a href={whatsappLink(prefill)} target="_blank" rel="noopener">
+        {SITE.whatsapp.display}
+      </a>
+    </div>
+  </div>
+
+  <div class="container">
+    <LayerLines onDark />
+    <div class="footer__colophon">
+      <p class="footer__colophon-code">{t('footer.colophonCode')}</p>
+      <p class="footer__colophon-copy">{t('footer.colophonCopy')}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--footer-bg);
+    color: var(--on-dark-text);
+    padding-block: clamp(3rem, 7vw, 5rem) 1.8rem;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.8rem;
+    padding-bottom: 3.2rem;
+  }
+  @media (min-width: 900px) {
+    .footer__grid {
+      grid-template-columns: minmax(0, 1.4fr) auto auto;
+      gap: clamp(3rem, 7vw, 6rem);
+    }
+  }
+
+  .footer__tagline {
+    margin-top: 1.4rem;
+    max-width: 30ch;
+    color: color-mix(in srgb, var(--on-dark-text) 72%, transparent);
+    font-size: 0.98rem;
+  }
+
+  .footer__heading {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.92rem;
+    margin-bottom: 1.1rem;
+  }
+  .footer__heading::after {
+    content: '';
+    display: block;
+    width: 1.6rem;
+    height: 2px;
+    background: var(--gold);
+    margin-top: 0.55rem;
+  }
+
+  .footer__menu,
+  .footer__contacts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+
+  .footer__menu a,
+  .footer__contacts a {
+    font-size: 0.96rem;
+    color: color-mix(in srgb, var(--on-dark-text) 85%, transparent);
+    text-decoration: none;
+    transition: color 0.16s ease;
+  }
+  .footer__menu a:hover,
+  .footer__contacts a:hover {
+    color: var(--gold);
+  }
+
+  .footer__colophon {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem 2rem;
+    padding-top: 1.1rem;
+  }
+  .footer__colophon-code {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--on-dark-text) 55%, transparent);
+  }
+  .footer__colophon-copy {
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--on-dark-text) 55%, transparent);
+  }
+</style>
