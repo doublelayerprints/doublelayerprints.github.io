@@ -1,13 +1,13 @@
 # Double LayeR Prints — sito
 
 Sito statico in [Astro](https://astro.build), bilingue IT/EN, deployato su GitHub Pages:
-**https://tancredibosi.github.io/doublelayer**
+**https://doublelayerprints.github.io**
 
 ## Comandi
 
 ```bash
 npm install        # una volta sola
-npm run dev        # dev server → http://localhost:4321/doublelayer
+npm run dev        # dev server → http://localhost:4321/
 npm run build      # build di produzione in dist/
 npm run preview    # prova la build
 npm run placeholders  # rigenera le immagini placeholder dei pezzi
@@ -51,7 +51,8 @@ aggiorna **entrambi** i file.
 
 Self-hosted in `public/fonts/` (Clash Display e Satoshi da Fontshare, Space Mono da
 Google Fonts). Se cambi `base` in `astro.config.mjs`, aggiorna anche i path
-`/doublelayer/fonts/...` in `src/styles/global.css` e i preload in `src/layouts/Base.astro`.
+`/fonts/...` in `src/styles/global.css` (i preload in `src/layouts/Base.astro`
+derivano automaticamente da `BASE_URL`).
 
 ## Deploy
 

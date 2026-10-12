@@ -285,7 +285,7 @@ JS vanilla, come filtri, menu e tema.
 
 - **Astro 5** (`5.18`), output statico, zero framework JS nel browser; vanilla
   JS solo per filtri galleria, menu mobile, tema e piano di stampa (`PageRail`).
-- `astro.config.mjs`: `site: https://tancredibosi.github.io`, `base: /doublelayer`,
+- `astro.config.mjs`: `site: https://doublelayerprints.github.io`, `base: /`,
   `trailingSlash: 'always'`, i18n con `prefixDefaultLocale: false`.
 - Helper `pathFor()`/`asset()` per generare URL con base corretta ovunque
   (link, immagini, font, preload).

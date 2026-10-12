@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// GitHub Pages: https://tancredibosi.github.io/doublelayer
+// GitHub Pages org-site: https://doublelayerprints.github.io
 export default defineConfig({
-  site: 'https://tancredibosi.github.io',
-  base: '/doublelayer',
+  site: 'https://doublelayerprints.github.io',
+  base: '/',
   integrations: [sitemap()],
   output: 'static',
   trailingSlash: 'always',

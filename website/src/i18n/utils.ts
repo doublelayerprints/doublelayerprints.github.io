@@ -10,7 +10,7 @@ const enToIt: Record<string, string> = Object.fromEntries(
   Object.entries(itToEn).map(([it, en]) => [en, it]),
 );
 
-const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, ''); // '/doublelayer'
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, ''); // '' con site-root, '/<nome-sito>' su Pages con prefisso
 
 /** Rotta "pulita" dall'URL corrente, senza base e senza slash: 'lavori/drago' | 'en/works/dragon' | '' */
 export function getRoute(url: URL): string {
