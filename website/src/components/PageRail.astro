@@ -5,8 +5,10 @@
  * è il file di slicing: ogni strato è una sezione (altezza proporzionale
  * all'apporto reale sulla pagina), la testa di stampa in oro è la posizione
  * di lettura. Al 100% lo stato diventa "; PRINT COMPLETE", l'eco del colophon.
- * Funziona senza JS (anchor + stati equidistanti); con JS misura, mappa e
- * segna lo strato attivo.
+ * L'indice mobile segue il riferimento getartcraft: la sezione in lettura
+ * è sempre l'header in cima alla rail; i passati escono sopra sfumando,
+ * i futuri restano in coda in fondo. Funziona senza JS (anchor + stati
+ * equidistanti); con JS misura, mappa e segna lo strato attivo.
  */
 import { ui, type UIKey, type Lang } from '../i18n/ui';
 
@@ -155,7 +157,7 @@ const items = sections.map((s, i) => ({
   .rail__label {
     position: absolute;
     right: calc(100% + 8px);
-    top: 0; /* assegnata via JS: carosello, trasla solo al cambio sezione */
+    top: 0; /* assegnata via JS: header in cima, colonna che scorre */
     opacity: var(--lo, 0); /* senza JS restano nascoste */
     display: inline-flex;
     align-items: baseline;
@@ -170,6 +172,11 @@ const items = sections.map((s, i) => ({
     transition:
       top 0.5s var(--ease-lay),
       opacity 0.28s ease;
+  }
+  /* Al primo paint le label non devono scattare da top:0 (default CSS)
+     alla posizione assegnata dal JS: un frame senza transizione. */
+  .rail__label[data-instant] {
+    transition: none;
   }
   .rail__num {
     font-weight: 700;
@@ -248,6 +255,9 @@ const items = sections.map((s, i) => ({
         })
         .filter(Boolean);
       if (!sections.length || sections.length !== segs.length) return;
+      labelEls.forEach(function (l) {
+        l.setAttribute('data-instant', '');
+      });
 
       let max = 1;
       let trackH = 1;
@@ -312,18 +322,16 @@ const items = sections.map((s, i) => ({
         }
         rail.setAttribute('data-complete', p > 0.995 ? 'true' : 'false');
 
-        /* L'indice carosello: tre slot fissi lungo la rail (sopra / centro /
-           sotto). I titoli restano fermi; quando cambia la sezione attiva
-           l'intera colonna trasla di uno slot, come nel riferimento. */
-        const prevActiveRaw = Number(rail.dataset.activeIdx || 0);
-        if (prevActiveRaw !== active) {
-          rail.dataset.activeIdx = String(active);
-        }
+        /* L'indice mobile: la sezione attiva è sempre l'header in cima
+           alla rail, un gradino sotto la nav (il posto sopra è del
+           titolo in uscita). Al cambio sezione l'intera colonna trasla
+           con le transizioni CSS di top e opacity. */
         const H = trackH;
-        const slotTop = -24; /* sopra l'orlo superiore */
-        const slotMid = Math.round(H / 2 - labelH / 2);
-        const slotBot = H + 24;
-        const dir = active >= prevActiveRaw ? 1 : -1;
+        const STEP = labelH + 10; /* gradino fra i titoli impilati */
+        const EXIT = 6;           /* orlo d'uscita: il passato si ferma qui */
+        const slotExit = EXIT;
+        const slotHead = EXIT + STEP;
+        const slotArrive = H - labelH - 12;
         for (let i = 0; i < segs.length; i++) {
           const l = labelEls[i];
           if (!l) continue;
@@ -331,20 +339,20 @@ const items = sections.map((s, i) => ({
           let top;
           let lo;
           if (d === 0) {
-            top = slotMid;
+            top = slotHead; /* l'header della pagina */
             lo = 1;
           } else if (d === -1) {
-            top = slotTop;
-            lo = 0.42;
-          } else if (d === 1) {
-            top = slotBot;
-            lo = 0.42;
+            top = slotExit; /* il passato resta un attimo e sfuma */
+            lo = 0.45;
           } else if (d < -1) {
-            top = slotTop - (slotMid - slotTop); /* oltre l'orlo, nascosto */
+            top = slotExit - (-1 - d) * STEP; /* coda sopra: oltre l'orlo */
             lo = 0;
+          } else if (d === 1) {
+            top = Math.max(slotArrive, slotHead + STEP); /* mai sopra l'header */
+            lo = 0.38;
           } else {
-            top = slotBot + (slotBot - slotMid);
-            lo = 0;
+            top = Math.max(slotArrive, slotHead + STEP) + (d - 1) * STEP;
+            lo = d === 2 ? 0.18 : 0;
           }
           if (l.dataset.hot === '1') lo = 1;
           l.style.top = top + 'px';
@@ -378,6 +386,15 @@ const items = sections.map((s, i) => ({
       rail.setAttribute('data-live', 'true');
       rail.setAttribute('data-complete', 'false');
       refresh();
+      // L'anti-scatto si toglie dopo due frame: il primo dipinge la
+      // posizione senza transizione, il secondo riattiva le transizioni.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          labelEls.forEach(function (l) {
+            l.removeAttribute('data-instant');
+          });
+        });
+      });
       // La measure è sensibile ai timing di load (CSS/fonte/re-layout): la
       // ripetiamo ai punti garantiti oltre a init.
       requestAnimationFrame(function () {
