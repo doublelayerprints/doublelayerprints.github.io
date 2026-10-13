@@ -20,6 +20,13 @@ npm run build    # verifica build
 
 Prima di dichiarare completo un lavoro sul sito: `npm run build` dentro `website/`.
 
+## Immagini
+
+- Tutto in `website/public/images/`: `works/` per le foto dei pezzi (referenziate
+  nei frontmatter dei `.md` in `website/src/content/works/`), il resto per
+  immagini generiche (usate con `asset('images/...')` nei componenti).
+-   Dettagli in `website/README.md` (sezioni "Aggiungere un pezzo" e "Foto vere").
+
 ## Git
 
 - **Vietato fare commit e push se non richiesti esplicitamente dall'utente.**

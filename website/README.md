@@ -38,10 +38,18 @@ I contatti attuali (handle Instagram, email, numero WhatsApp) sono **placeholder
 
 ## Foto vere
 
-Le immagini dei pezzi sono placeholder SVG generati (`npm run placeholders`).
+**Dove vanno le immagini:** tutto in `public/images/` (i file lì sono serviti così come sono).
+
+- **Foto dei pezzi (portfolio):** meta in `public/images/works/`, referenziate nei
+  frontmatter dei `.md` in `src/content/works/` (vedi "Aggiungere un pezzo" sopra).
+- **Immagini generiche (hero, chi-siamo, ecc.):** in `public/images/`, usate nei
+  componenti con `asset('images/file.jpg')` (es. `src/components/pages/HomePage.astro`).
+
+Le immagini dei pezzi sono attualmente placeholder SVG generati (`npm run placeholders`).
 Quando arrivate le foto custom, basta salvarle in `public/images/works/` con lo stesso
 nome del file referenziato nei `.md` (es. `dragon-bust-1.jpg`) e aggiornare i path
-nei frontmatter. La foto del laboratorio: `public/images/studio.jpg` è
+nei frontmatter: un solo file per foto basta (le varianti `-dark` servivano solo
+ai placeholder SVG per i due temi). La foto del laboratorio: `public/images/studio.jpg` è
 l'originale full-res, `public/images/studio-16.jpg` (1600px) è la versione
 compressa usata dal sito (rigenerabile con
 `sips -Z 1600 -s format jpeg -s formatOptions 72`): quando aggiorni la foto,
