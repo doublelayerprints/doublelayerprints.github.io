@@ -6,7 +6,9 @@
  * così anche uno scroll veloce lascia vedere gli strati (CAP 0.7/s:
  * l'intera stampa attraversa in ~1.4s comunque si scrolli). Tutto
  * scroll-linked; il JS è solo il clock, le trasformazioni nel CSS.
- * Attiva solo con JS e senza preferenza ridotta; altrimenti statico.
+ * Attiva solo con JS e senza preferenza ridotta, e solo ≥760px: sotto,
+ * l'hero resta statico (su telefono pin e stage allungato creavano
+ * spazio morto e flick; 2026-10-13). Altrimenti statico.
  */
 interface Props {
   id?: string;
@@ -145,6 +147,7 @@ const { id } = Astro.props;
     };
 
     var seek = function () {
+      if (!liveShown) return; /* mobile: niente scena, niente lavoro */
       target = computeTarget();
       if (!inView) {
         stopLoop();
@@ -181,7 +184,30 @@ const { id } = Astro.props;
       });
     };
 
-    stage.setAttribute('data-scene-live', '');
+    /* La scena vive solo ≥760px: sotto, l'hero resta naturale e statico
+       (niente pin, niente spazio morto, la foto non svanisce). La
+       commutazione è una sola fonte: l'attributo data-scene-live — senza
+       di lui ogni regola .hero-stage[data-scene-live] è inerte. */
+    var mqPhone = window.matchMedia('(max-width: 759px)');
+    var liveShown = false;
+
+    var setLive = function (on) {
+      if (on === liveShown) return;
+      liveShown = on;
+      if (on) {
+        stage.setAttribute('data-scene-live', '');
+      } else {
+        stage.removeAttribute('data-scene-live');
+        stopLoop();
+      }
+    };
+
+    var onPhone = function () {
+      setLive(!mqPhone.matches);
+      snap();
+    };
+
+    setLive(!mqPhone.matches);
     snap();
     requestAnimationFrame(snap);
     window.addEventListener('load', snap);
@@ -190,6 +216,11 @@ const { id } = Astro.props;
     }
     window.addEventListener('scroll', seek, { passive: true });
     window.addEventListener('resize', onResize);
+    if (mqPhone.addEventListener) {
+      mqPhone.addEventListener('change', onPhone);
+    } else if (mqPhone.addListener) {
+      mqPhone.addListener(onPhone);
+    }
     if (window.ResizeObserver) {
       new ResizeObserver(onResize).observe(document.documentElement);
     }

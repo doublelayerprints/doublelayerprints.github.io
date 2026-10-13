@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import LayerLines from '../LayerLines.astro';
 import PageRail from '../PageRail.astro';
+import SectionBar from '../SectionBar.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
 import { pathFor, asset } from '../../i18n/utils';
 import { PRINTERS, SITE, whatsappLink } from '../../consts';
@@ -29,17 +30,17 @@ const photoAlt =
   lang === 'it'
     ? 'Il laboratorio: due stampanti 3D, una Anycubic Kobra 3 e una Anycubic Kobra X, con le bobine di filamento'
     : 'The workshop: two 3D printers, an Anycubic Kobra 3 and an Anycubic Kobra X, with filament spools';
+
+const sections: Array<{ id: string; label: UIKey }> = [
+  { id: 'storia', label: 'rail.about' },
+  { id: 'stampanti', label: 'rail.printers' },
+  { id: 'parliamone', label: 'rail.talk' },
+];
 ---
 
 <Base lang={lang} canonical="chi-siamo" title={`${t('about.title')} · ${SITE.name}`}>
-  <PageRail
-    lang={lang}
-    sections={[
-      { id: 'storia', label: 'rail.about' },
-      { id: 'stampanti', label: 'rail.printers' },
-      { id: 'parliamone', label: 'rail.talk' },
-    ]}
-  />
+  <PageRail lang={lang} sections={sections} />
+  <SectionBar lang={lang} sections={sections} />
   <section class="section" id="storia">
     <div class="container">
       <div class="section-head">

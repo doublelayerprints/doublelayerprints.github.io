@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PageRail from '../PageRail.astro';
+import SectionBar from '../SectionBar.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
 import { pathFor } from '../../i18n/utils';
 
@@ -9,10 +10,15 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = (key: UIKey): string => ui[lang][key];
+
+const sections: Array<{ id: string; label: UIKey }> = [
+  { id: 'mancante', label: '404.title' },
+];
 ---
 
 <Base lang={lang} canonical="" title={t('404.title')}>
-  <PageRail lang={lang} sections={[{ id: 'mancante', label: '404.title' }]} />
+  <PageRail lang={lang} sections={sections} />
+  <SectionBar lang={lang} sections={sections} />
   <section class="section nf" id="mancante">
     <div class="container">
       <p class="nf__code" aria-hidden="true">; LAYER NOT FOUND</p>

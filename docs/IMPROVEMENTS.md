@@ -424,7 +424,45 @@ screenshot zoom light/dark di conferma.
 
 ---
 
-## 11. Dipendenze da te (fuori dal codice)
+## 11. Fase 9 — Indice mobile + hero statico su telefono — COMPLETATA (2026-10-13)
+
+Spec: `docs/superpowers/specs/2026-10-13-mobile-section-bar-design.md`.
+
+**Problema riscontrato su mobile** (da screenshot del committente): la scena
+"Deposizione" dell'hero girava anche <760px, ma con il pin sticky disattivato —
+risultato: ~1 schermata di vuoto dopo l'hero (stage 240svh senza pin,
+`global.css` pre-fix) e un flick della foto (dissolvenza attiva, fasce che
+avrebbero dovuto sostituirla invisibili). La spec hero aveva già dichiarato la
+scena semplificata <760px come decisione di tuning, ma non era implementata.
+
+**Soluzioni**:
+
+- **Barra indice mobile** (`website/src/components/SectionBar.astro`, ispirata
+  a getartcraft): sticky `top: 4rem` sotto la nav, visibile solo <1280px
+  (specchio inverso della rail: mai due indici insieme). Etichetta
+  `NN / NOME SEZIONE` mono (stesse chiavi `rail.*`, stessa legge del 45%),
+  aria-hidden (le h{n} di sezione danno la struttura). Con cambio sezione:
+  mini-ingresso 0.28s. Montata su tutte le pagine con rail (home, lavori,
+  dettaglio, chi-siamo, contatti, 404) passando loro la stessa lista
+  `sections` di `PageRail`.
+- **Ero ancore**: `[id] { scroll-margin-top: calc(4.5rem + var(--sbar-h)) }`,
+  var definita su `:root:has([data-sbar])` solo <1280px.
+- **Hero statico <760px** (scelta utente, supera la "scena semplificata" della
+  spec hero): `HeroScene` legge `matchMedia('(max-width: 759px)')` — se
+  telefono non pone `data-scene-live` (una fonte sola: ogni regola della
+  scena è inerte senza l'attributo); al passaggio 759↔760 monta/smonta.
+  Cintura CSS a fine `global.css` (`height: auto` + foto `opacity: 1`)
+  per il contratto statico esplicito.
+
+Verificato con CDP (Chrome headless, viewport emulata): mobile — scena spenta
+(`data-scene-live` assente), foto opaca a metà scroll, barra presente su 6
+pagine con cambio etichetta corretto (01 → 02 → 03 a `#process`), sticky
+ancorata a 64px; desktop 1440 — rail flessa, barra assente, scena attiva
+(docH 5538). Build ok.
+
+---
+
+## 12. Dipendenze da te (fuori dal codice)
 
 1. **Contatti veri** in `website/src/consts.ts`: handle Instagram, email,
    numero WhatsApp (ora placeholder).
@@ -434,9 +472,9 @@ screenshot zoom light/dark di conferma.
 
 ---
 
-## 12. Ordine di esecuzione consigliato
+## 13. Ordine di esecuzione consigliato
 
-Tutte le fasi middleware sono completate (3 → 2 → 1 → 4 → 5 → 6 → 7 → 8).
+Tutte le fasi middleware sono completate (3 → 2 → 1 → 4 → 5 → 6 → 7 → 8 → 9).
 Il prossimo blocco è fuori dal codice (§11): foto, contatti, verifica OG.
 
 Ogni fase finisce con `npm run build` + screenshot di verifica (metodo CDP

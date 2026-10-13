@@ -5,6 +5,7 @@ import Wordmark from '../Wordmark.astro';
 import GCodeStrip from '../GCodeStrip.astro';
 import LayerLines from '../LayerLines.astro';
 import PageRail from '../PageRail.astro';
+import SectionBar from '../SectionBar.astro';
 import ProductPlate from '../ProductPlate.astro';
 import HeroScene from '../HeroScene.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
@@ -25,19 +26,21 @@ const featured = works.filter((e) => e.data.featured).slice(0, 4);
 const steps = [1, 2, 3] as const;
 const stepKey = (i: number, part: 'title' | 'text') =>
   `process.${i}.${part}` as UIKey;
+
+/* L'indice della pagina: rail desktop (≥1280px) e barra mobile (<1280px)
+   leggono la stessa lista. */
+const sections: Array<{ id: string; label: UIKey }> = [
+  { id: 'intro', label: 'rail.intro' },
+  { id: 'selected', label: 'rail.selected' },
+  { id: 'process', label: 'rail.process' },
+  { id: 'duo', label: 'rail.duo' },
+  { id: 'parliamone', label: 'rail.talk' },
+];
 ---
 
 <Base lang={lang} canonical="">
-  <PageRail
-    lang={lang}
-    sections={[
-      { id: 'intro', label: 'rail.intro' },
-      { id: 'selected', label: 'rail.selected' },
-      { id: 'process', label: 'rail.process' },
-      { id: 'duo', label: 'rail.duo' },
-      { id: 'parliamone', label: 'rail.talk' },
-    ]}
-  />
+  <PageRail lang={lang} sections={sections} />
+  <SectionBar lang={lang} sections={sections} />
   <!-- ================= Hero ================= -->
   <HeroScene id="intro">
     <section class="hero">

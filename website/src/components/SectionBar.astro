@@ -1,0 +1,196 @@
+---
+/**
+ * Barra indice mobile — specchio <1280px della rail: dice sempre in che
+ * sezione si è (riferimento getartcraft: chip sotto l'header). Vive solo
+ * dove la pagina ha già il PageRail: riceve la stessa lista `sections`,
+ * stesse chiavi i18n `rail.*` — zero stringhe nuove.
+ * Indicatore non interattivo (aria-hidden): le intestazioni di sezione
+ * danno già la struttura a chi legge con lo screen reader.
+ * Il JS aggiorna solo il testo al cambio sezione e rigioca una
+ * micro-animazione d'ingresso; legge del 45% viewport, come la rail.
+ */
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  sections: Array<{ id: string; label: UIKey }>;
+}
+const { lang, sections } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+const items = sections.map((s, i) => ({
+  id: s.id,
+  num: String(i + 1).padStart(2, '0'),
+  label: t(s.label),
+}));
+const first = items[0];
+---
+
+{
+  first && (
+    <div
+      class="sbar"
+      data-sbar
+      data-sbar-items={JSON.stringify(items)}
+      aria-hidden="true"
+    >
+      <p class="sbar__label" data-sbar-label data-bump>
+        <span class="sbar__num" data-sbar-num>
+          {first.num}
+        </span>
+        <span class="sbar__slash">/</span>
+        <span class="sbar__name" data-sbar-name>
+          {first.label}
+        </span>
+      </p>
+    </div>
+  )
+}
+
+<style>
+  .sbar {
+    display: none;
+  }
+  /* Specchio esatto della rail: la rail si toglie <1280px, qui sopra
+     non c'è — mai due indici sulla stessa finestra. */
+  @media (max-width: 1279px) {
+    .sbar {
+      position: sticky;
+      top: 4rem; /* la nav sticky è alta 4rem */
+      z-index: 40; /* subito sotto la nav (50), come la rail */
+      height: 2.5rem; /* il var --sbar-h (global.css) calcola le ancore */
+      display: flex;
+      align-items: center;
+      padding-inline: var(--gutter);
+      background: color-mix(in srgb, var(--paper) 94%, transparent);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+  }
+
+  .sbar__label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 0.72rem; /* voce della rail: stessa scala dell'indice */
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .sbar__num {
+    font-weight: 700;
+    color: var(--purple-text);
+  }
+  .sbar__slash {
+    color: var(--line-dark);
+  }
+  .sbar__name {
+    color: var(--muted);
+  }
+
+  /* Cambio sezione: micro-ingresso, come le label della rail in scena */
+  .sbar__label[data-bump] {
+    animation: sbar-in 0.28s var(--ease-lay);
+  }
+  @keyframes sbar-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var init = function () {
+      var bar = document.querySelector('[data-sbar]');
+      if (!bar) return;
+      var label = bar.querySelector('[data-sbar-label]');
+      var numEl = bar.querySelector('[data-sbar-num]');
+      var nameEl = bar.querySelector('[data-sbar-name]');
+      if (!label || !numEl || !nameEl) return;
+
+      var PAD = 0.45; /* legge della rail: attiva oltre il 45% della viewport */
+      var list;
+      try {
+        list = JSON.parse(bar.getAttribute('data-sbar-items') || '[]');
+      } catch (e) {
+        list = [];
+      }
+      var sections = list
+        .map(function (it) {
+          return document.getElementById(it.id);
+        })
+        .filter(Boolean);
+      if (!sections.length || sections.length !== list.length) return;
+
+      var tops = [];
+      var cur = -1;
+      var measure = function () {
+        tops = sections.map(function (el) {
+          return el.getBoundingClientRect().top + window.scrollY;
+        });
+      };
+
+      var render = function () {
+        if (!tops.length) return;
+        var line = window.scrollY + window.innerHeight * PAD;
+        var active = 0;
+        for (var i = 0; i < tops.length; i++) {
+          if (line >= tops[i]) active = i;
+        }
+        if (active === cur) return;
+        cur = active;
+        var it = list[active];
+        if (!it) return;
+        numEl.textContent = it.num;
+        nameEl.textContent = it.label;
+        /* Rigioca l'ingresso solo quando cambia davvero */
+        label.removeAttribute('data-bump');
+        void label.offsetWidth;
+        label.setAttribute('data-bump', '');
+      };
+
+      var rafPending = false;
+      var schedule = function (fn) {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(function () {
+          rafPending = false;
+          fn();
+        });
+      };
+      var refresh = function () {
+        measure();
+        render();
+      };
+
+      refresh();
+      /* L'altezza della pagina cambia (filtri, documenti, font): la
+         ricalibrazione segue lo stesso istinto della rail. */
+      window.addEventListener('scroll', function () {
+        schedule(render);
+      }, { passive: true });
+      window.addEventListener('resize', function () {
+        schedule(refresh);
+      });
+      window.addEventListener('load', refresh);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(refresh);
+      }
+      if (window.ResizeObserver) {
+        new ResizeObserver(function () {
+          schedule(refresh);
+        }).observe(document.documentElement);
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

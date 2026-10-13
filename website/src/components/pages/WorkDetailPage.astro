@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageRail from '../PageRail.astro';
+import SectionBar from '../SectionBar.astro';
 import SpecTable from '../SpecTable.astro';
 import LayerLines from '../LayerLines.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
@@ -21,6 +22,12 @@ const firstParagraph = entry.body?.split('\n\n')[0]?.slice(0, 155) ?? '';
 const prefill = t('work.whatsappPrefill').replace('{title}', entry.data.title);
 const isPlaceholder = entry.data.photos[0].endsWith('.svg');
 const darkVariant = (p: string) => p.replace(/\.svg$/, '-dark.svg');
+
+const sections: Array<{ id: string; label: UIKey }> = [
+  { id: 'pezzo', label: 'rail.piece' },
+  { id: 'specifiche', label: 'rail.specs' },
+  { id: 'parliamone', label: 'rail.talk' },
+];
 ---
 
 <Base
@@ -29,14 +36,8 @@ const darkVariant = (p: string) => p.replace(/\.svg$/, '-dark.svg');
   title={`${entry.data.title} · ${SITE.name}`}
   description={`${firstParagraph}…`}
 >
-  <PageRail
-    lang={lang}
-    sections={[
-      { id: 'pezzo', label: 'rail.piece' },
-      { id: 'specifiche', label: 'rail.specs' },
-      { id: 'parliamone', label: 'rail.talk' },
-    ]}
-  />
+  <PageRail lang={lang} sections={sections} />
+  <SectionBar lang={lang} sections={sections} />
   <section class="section" id="pezzo">
     <div class="container">
       <a class="link back" href={pathFor('lavori', lang)}>{t('work.back')}</a>

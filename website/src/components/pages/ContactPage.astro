@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import LayerLines from '../LayerLines.astro';
 import PageRail from '../PageRail.astro';
+import SectionBar from '../SectionBar.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
 import { SITE, whatsappLink } from '../../consts';
 
@@ -11,6 +12,10 @@ interface Props {
 const { lang } = Astro.props;
 const t = (key: UIKey): string => ui[lang][key];
 const prefill = t('contact.whatsappPrefill');
+
+const sections: Array<{ id: string; label: UIKey }> = [
+  { id: 'canali', label: 'rail.talk' },
+];
 
 const icons = {
   ig: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="0.4" fill="currentColor" stroke="none"></circle></svg>`,
@@ -50,7 +55,8 @@ const channels = [
 ---
 
 <Base lang={lang} canonical="contatti" title={`${t('contact.title')} · ${SITE.name}`}>
-  <PageRail lang={lang} sections={[{ id: 'canali', label: 'rail.talk' }]} />
+  <PageRail lang={lang} sections={sections} />
+  <SectionBar lang={lang} sections={sections} />
   <section class="section" id="canali">
     <div class="container">
       <div class="section-head">

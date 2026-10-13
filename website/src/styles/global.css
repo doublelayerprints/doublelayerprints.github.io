@@ -234,9 +234,15 @@ h4 {
   margin-inline: auto;
 }
 
-/* Le ancore atterrano sotto la nav sticky */
+/* Le ancore atterrano sotto la nav sticky (e, su mobile, sotto la barra
+   indice: --sbar-h è definita solo con la barra educata in pagina). */
 [id] {
-  scroll-margin-top: 4.5rem;
+  scroll-margin-top: calc(4.5rem + var(--sbar-h, 0rem));
+}
+@media (max-width: 1279px) {
+  :root:has([data-sbar]) {
+    --sbar-h: 2.5rem;
+  }
 }
 
 .section {
@@ -724,5 +730,19 @@ h4 {
     scale: 0.95;
     background: color-mix(in srgb, var(--purple) 12%, var(--paper-dim));
     border: 1px solid color-mix(in srgb, var(--purple) 55%, transparent);
+  }
+}
+
+/* Cintura mobile: sotto 760px l'hero resta naturale anche se l'attributo
+   scena fosse presente (il JS non lo pone; qui il contratto è esplicito).
+   A fine file per vincere la cascata a parità di specificità.
+   Niente stage allungato = niente spazio morto; niente dissolvenza =
+   niente flick della foto. */
+@media (max-width: 759px) {
+  .hero-stage[data-scene-live] {
+    height: auto;
+  }
+  .hero-stage[data-scene-live] .hero__imgwrap > img {
+    opacity: 1;
   }
 }
