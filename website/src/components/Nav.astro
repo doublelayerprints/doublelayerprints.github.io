@@ -23,7 +23,10 @@ const isCurrent = (route: string) =>
   <div class="container nav__inner">
     <a class="nav__brand" href={pathFor('', lang)}>
       <span class="nav__brand-a">Double</span>
-      <span class="nav__brand-b">LayeR</span>
+      <span class="nav__brand-b">
+        <span class="nav__brand-b-echo" aria-hidden="true">LayeR</span>
+        <span class="nav__brand-b-front">LayeR</span>
+      </span>
       <span class="nav__brand-sub">prints</span>
     </a>
 
@@ -193,8 +196,21 @@ const isCurrent = (route: string) =>
   .nav__brand-a {
     color: var(--purple-text);
   }
+  /* "LayeR": fronte oro + eco viola fuori registro, come il wordmark
+     grande — senza animazione (il gesto coreografico resta nell'hero) */
   .nav__brand-b {
-    color: var(--ink);
+    position: relative;
+    display: inline-block;
+  }
+  .nav__brand-b-front {
+    position: relative;
+    color: var(--mark-layer);
+  }
+  .nav__brand-b-echo {
+    position: absolute;
+    inset: 0;
+    transform: translate(0.085em, 0.05em);
+    color: var(--mark-echo);
   }
   .nav__brand-sub {
     font-family: var(--font-mono);

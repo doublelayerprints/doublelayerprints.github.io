@@ -1,17 +1,25 @@
 ---
 /**
  * Il wordmark: due strati tipografici.
- * "Double" in Filament Purple, "LayeR" in Nozzle Ink,
- * con un'eco in Silk Gold fuori registro — il "layer shift"
+ * "Double" in Filament Purple, "LayeR" in Silk Gold,
+ * con un'eco viola fuori registro — il "layer shift"
  * che si mette in registro al caricamento della pagina.
  * In hero è l'h1 della pagina; altrove (footer) è testo semplice.
+ *
+ * Variante `printable`: porta lo stack dello slicer — 20 copie
+ * del wordmark tagliate orizzontalmente, che durante la scena
+ * "Deposizione" depositano dal basso verso l'alto, con la testa
+ * d'oro che risale il blocco. È aria residua: senza la scena
+ * (no JS, reduced-motion) restano opacity 0, invisibili.
  */
 interface Props {
   size?: 'hero' | 'footer';
   onDark?: boolean;
+  printable?: boolean;
 }
-const { size = 'hero', onDark = false } = Astro.props;
+const { size = 'hero', onDark = false, printable = false } = Astro.props;
 const Tag = size === 'hero' ? 'h1' : 'p';
+const N_SLICES = 20;
 ---
 
 <Tag class:list={['mark', `mark--${size}`, { 'mark--on-dark': onDark }]}>
@@ -19,10 +27,25 @@ const Tag = size === 'hero' ? 'h1' : 'p';
   <span class="mark__visual" aria-hidden="true">
     <span class="mark__a">Double</span>
     <span class="mark__b">
+      {size === 'hero' && <span class="mark__b-deep">LayeR</span>}
       <span class="mark__b-echo">LayeR</span>
       <span class="mark__b-ink">LayeR</span>
     </span>
     <span class="mark__sub">prints</span>
+    {
+      printable && (
+        <span class="mark__slicestack" aria-hidden="true">
+          {Array.from({ length: N_SLICES }).map((_, i) => (
+            <span class="mark__slice" style={`--i:${i}`} aria-hidden="true">
+              <span class="mark__slice-a">Double</span>
+              <span class="mark__slice-b">LayeR</span>
+              <span class="mark__slice-sub">prints</span>
+            </span>
+          ))}
+          <span class="mark__print-head" aria-hidden="true"></span>
+        </span>
+      )
+    }
   </span>
 </Tag>
 
@@ -33,6 +56,10 @@ const Tag = size === 'hero' ? 'h1' : 'p';
     letter-spacing: -0.02em;
     line-height: 0.94;
     text-wrap: nowrap;
+  }
+
+  .mark--hero .mark__visual {
+    position: relative;
   }
 
   .mark__visual {
@@ -55,24 +82,40 @@ const Tag = size === 'hero' ? 'h1' : 'p';
 
   .mark__b {
     position: relative;
-    color: var(--ink);
+    color: var(--mark-layer);
   }
 
   .mark--on-dark .mark__a {
     color: var(--purple-on-dark);
   }
 
-  .mark--on-dark .mark__b {
-    color: var(--on-dark-text);
+  /* Su fondi sempre scuri (footer): eco viola costante —
+     la fronte resta ereditata oro. */
+  .mark--on-dark .mark__b-echo {
+    color: var(--purple-on-dark);
   }
 
-  /* L'eco: il secondo strato, in Silk Gold, fuori registro */
+  /* L'eco: il secondo strato, in viola fuori registro.
+     L'ampiezza può essere guidata dalla scena (--echo-spread). */
   .mark__b-echo {
     position: absolute;
     inset: 0;
-    color: var(--gold);
+    color: var(--mark-echo);
     z-index: -1;
-    transform: translate(0.085em, 0.05em);
+    transform: translate(
+      calc(0.085em + var(--echo-spread, 0em)),
+      calc(0.05em + var(--echo-spread, 0em) * 0.55)
+    );
+  }
+
+  /* Il terzo strato: viola profondo, visibile solo nella scena */
+  .mark__b-deep {
+    position: absolute;
+    inset: 0;
+    color: var(--purple-deep);
+    z-index: -2;
+    transform: translate(-0.05em, -0.12em);
+    opacity: var(--echo-deep, 0);
   }
 
   .mark__sub {
@@ -86,7 +129,7 @@ const Tag = size === 'hero' ? 'h1' : 'p';
   }
 
   .mark--on-dark .mark__sub {
-    color: var(--gold);
+    color: var(--on-dark-muted);
   }
 
   /* Dimensioni */
@@ -95,6 +138,54 @@ const Tag = size === 'hero' ? 'h1' : 'p';
   }
   .mark--footer {
     font-size: clamp(2.6rem, 7vw, 4.8rem);
+  }
+
+  /* Il footer ha un fondo opaco ma nessun contesto di stacking:
+     senza questo, l'eco (z -1) verrebbe dipinta sotto al fondo. */
+  .mark--footer .mark__visual {
+    isolation: isolate;
+  }
+
+  /* ---- Stack dello slicer: copie a fasce del wordmark ---- */
+  .mark__slicestack {
+    position: absolute;
+    inset: 0;
+    display: block;
+    --n: 20;
+  }
+  .mark__slice {
+    position: absolute;
+    inset: 0;
+    display: block;
+    opacity: 0;
+  }
+  .mark__slice-a,
+  .mark__slice-b,
+  .mark__slice-sub {
+    display: block;
+  }
+  .mark__slice-a {
+    color: var(--purple-display);
+  }
+  .mark__slice-b {
+    color: var(--mark-layer);
+  }
+  .mark__slice-sub {
+    margin-top: 1.1rem;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: var(--text-md);
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .mark__print-head {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--gold);
+    opacity: 0;
   }
 
   /* Il momento coreografato: l'eco si mette in registro */
@@ -107,9 +198,42 @@ const Tag = size === 'hero' ? 'h1' : 'p';
       opacity: 1;
     }
     to {
-      transform: translate(0.085em, 0.05em);
+      transform: translate(
+        calc(0.085em + var(--echo-spread, 0em)),
+        calc(0.05em + var(--echo-spread, 0em) * 0.55)
+      );
       opacity: 1;
     }
+  }
+
+  /* ---- Scena "Deposizione": il wordmark si stampa dal basso.
+     Base in ghost slicer mentre le fasce depositano; la testa
+     d'oro risale il blocco e al rilascio tutto torna pieno. ---- */
+  :global(.hero-stage[data-scene-live]) .mark__a,
+  :global(.hero-stage[data-scene-live]) .mark__b,
+  :global(.hero-stage[data-scene-live]) .mark__sub {
+    opacity: calc(1 - var(--k-word-ghost, 0));
+  }
+  :global(.hero-stage[data-scene-live]) .mark__slice {
+    opacity: calc(
+      clamp(0, calc(var(--pw, 0) * var(--n, 20) - var(--i, 0)), 1) *
+        (1 - var(--k-wfade, 0))
+    );
+    transform: translateY(
+      calc(
+        (1 - clamp(0, calc(var(--pw, 0) * var(--n, 20) - var(--i, 0)), 1)) *
+          -0.32em
+      )
+    );
+    will-change: transform, opacity;
+    clip-path: inset(
+      calc((1 - (var(--i, 0) + 1) / var(--n, 20)) * 100%) 0
+        calc(var(--i, 0) / var(--n, 20) * 100%) 0
+    );
+  }
+  :global(.hero-stage[data-scene-live]) .mark__print-head {
+    bottom: calc(var(--pw, 0) * 100%);
+    opacity: var(--k-word-ghost, 0);
   }
 
   @media (prefers-reduced-motion: no-preference) {

@@ -76,13 +76,20 @@
   --purple-text: #5b2e91;  /* viola per testo/link su fondo del tema */
   --purple-display: #5b2e91; /* viola per il display del wordmark su fondo del tema */
   --purple-on-dark: #8b68c9; /* viola sollevato per display su fondi ink (footer) — costante */
-  --gold: #ffce00;         /* Silk Gold — dal logo: mai testo su chiaro */
+  --gold: #ffce00;         /* Silk Gold — dal logo; mai testo su chiaro,
+                              tranne la fronte del wordmark (eccezione
+                              da-logo, 2026-10-13) */
   --muted: #625d6e;        /* lavanda-grigio per testo secondario */
   --line: #d9d7de;         /* layer line chiara */
   --line-dark: #c3c0cb;    /* layer line marcata */
   --focus: #5b2e91;        /* ring focus: viola su chiaro, oro su scuro */
   --footer-bg: #241a30;    /* fondo footer: ink nel chiaro, più profondo nello scuro */
   --on-dark-text: #eceaf0; /* testo su fondi ink/footer — costante */
+
+  --mark-layer: #ffce00;   /* fronte "LayeR" del wordmark — oro, costante */
+  --mark-echo: #472271;    /* eco viola dietro "LayeR", su fondo del tema */
+  --on-dark-muted: #a39daf; /* testo secondario ("prints" footer) su fondi
+                              sempre scuri — costante */
 
   /* Type */
   --font-display: 'Clash Display', 'Satoshi', system-ui, sans-serif;
@@ -125,6 +132,8 @@
   --focus: #ffce00;        /* oro su scuro: 12.2:1 */
   --purple-text: #a98bd9;  /* 6.4:1 su Notturno */
   --purple-display: #8b68c9; /* 4.25:1, testo display grande */
+
+  --mark-echo: #8b68c9;    /* eco viola su Notturno — il viola di Double */
   --footer-bg: #140f1d;    /* più profondo del body, per distinguersi */
 }
 
@@ -510,5 +519,210 @@ h4 {
   }
   .anim-rise-late {
     animation: rise 0.7s ease 0.85s both;
+  }
+}
+
+/* ------------------------------------------------------------
+   Scena hero "Deposizione" — il pin che stampa la home strato
+   per strato. Il JS (HeroScene) è solo il clock: scrive le var
+   di progresso sulla scena; qui tutte le trasformazioni.
+   Tutto vive dentro .hero-stage[data-scene-live]: senza JS o
+   con reduced-motion l'attributo non esiste e la pagina è
+   esattamente quella di oggi.
+   ------------------------------------------------------------ */
+.hero-stage[data-scene-live] {
+  position: relative;
+  height: 240svh;
+}
+
+@media (min-width: 760px) {
+  .hero-stage[data-scene-live] .hero-scene {
+    position: sticky;
+    top: var(--scene-top, 4rem);
+    min-height: calc(100svh - var(--scene-top, 4rem));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero-stage[data-scene-live] .hero-scene > .hero {
+    width: 100%;
+  }
+  .hero-stage[data-scene-live] .hero__grid {
+    perspective: 1000px;
+  }
+}
+
+/* Plate foto: si inclina e si solleva in 3D dentro la sua finestra */
+.hero-stage[data-scene-live] .hero__photo {
+  position: relative;
+  z-index: 0;
+  transform: translateY(calc(var(--k-tilt, 0) * -18px))
+    rotateX(calc(var(--k-tilt, 0) * 12deg));
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+/* La foto passa in "anteprima slicer": l'originale si affievolisce
+   mentre le fasce depositano; le regole di stampa sono nel file
+   di componente Wordmark/HeroScene via var --pp/--pw. */
+.hero-stage[data-scene-live] .hero__imgwrap > img {
+  opacity: calc(1 - var(--k-photo-ghost, 0));
+}
+
+/* Testina d'oro sul bordo superiore della foto: il "bed" */
+.scene-bed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  opacity: 0;
+  background: var(--gold);
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* Contatore globale di strato sulla foto */
+.scene-count {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 6;
+  padding: 0.32rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--footer-bg) 88%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Fasce della foto: 6 strati che si depositano dal basso (FDM).
+   La maschera clip-path per fascia e il deposito derivano da
+   --pp / --i / --n, allineati al wordmark. Foto, bed e contatore
+   guardano solo ≥760px: sotto resta la coda leggera. */
+.hero__imgwrap {
+  position: relative;
+  overflow: hidden;
+}
+.hero__imgwrap > img {
+  position: relative;
+  z-index: 2;
+}
+.hero__bands {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  --n: 20;
+}
+.hero__band {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.print-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold);
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pressione della piastra su scritta e CTA (più marcata) */
+.hero-stage[data-scene-live] .hero__tagline {
+  transform: translateY(calc(var(--k-press, 0) * 7px));
+}
+.hero-stage[data-scene-live] .hero__cta {
+  transform: translateY(calc(var(--k-press, 0) * 9px));
+}
+
+/* Pressione della piastra su scritta e CTA (più marcata) */
+.hero-stage[data-scene-live] .hero__tagline {
+  transform: translateY(calc(var(--k-press, 0) * 7px));
+}
+.hero-stage[data-scene-live] .hero__cta {
+  transform: translateY(calc(var(--k-press, 0) * 9px));
+}
+
+@media (min-width: 760px) {
+  .hero-stage[data-scene-live] .scene-bed {
+    width: calc(var(--k-bed, 0) * 100%);
+    opacity: var(--k-bed, 0);
+  }
+  .hero-stage[data-scene-live] .scene-count {
+    opacity: min(1, calc(var(--k-count, 0) * 25));
+  }
+
+  /* Le fasce della foto: ognuna copia la propria banda con
+     clip-path, scende da -26px e si deposita bottom-up. */
+  .hero-stage[data-scene-live] .hero__band {
+    will-change: transform, opacity;
+    clip-path: inset(
+      calc((1 - (var(--i, 0) + 1) / var(--n, 20)) * 100%) 0
+        calc(var(--i, 0) / var(--n, 20) * 100%) 0
+    );
+    opacity: calc(
+      clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1) *
+        (1 - var(--k-pfade, 0))
+    );
+    transform: translateY(
+      calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -26px)
+    );
+  }
+  .hero-stage[data-scene-live] .hero__band:nth-child(odd) {
+    transform: translateY(
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -26px)
+      )
+      translateX(
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * 9px)
+      );
+  }
+  .hero-stage[data-scene-live] .hero__band:nth-child(even) {
+    transform: translateY(
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -26px)
+      )
+      translateX(
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -9px)
+      );
+  }
+
+  /* Il frontier della stampa: la testa d'oro risale la foto */
+  .hero-stage[data-scene-live] .print-head {
+    bottom: calc(var(--pp, 0) * 100%);
+    opacity: var(--k-photo-ghost, 0);
+  }
+
+  /* Plate fantasma sotto la foto: lo spessore steso dell'oggetto */
+  .hero__ghost {
+    position: absolute;
+    top: 0.55rem;
+    left: 0.55rem;
+    right: 0.55rem;
+    aspect-ratio: 4 / 3;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hero-stage[data-scene-live] .hero__ghost {
+    opacity: var(--k-ghost, 0);
+  }
+  .hero-stage[data-scene-live] .hero__ghost[data-ghost='1'] {
+    translate: 0 calc(var(--k-ghost, 0) * 16px);
+    scale: 0.975;
+    background: var(--paper-dim);
+    border: 1px solid var(--line-dark);
+  }
+  .hero-stage[data-scene-live] .hero__ghost[data-ghost='2'] {
+    translate: 0 calc(var(--k-ghost, 0) * 30px);
+    scale: 0.95;
+    background: color-mix(in srgb, var(--purple) 12%, var(--paper-dim));
+    border: 1px solid color-mix(in srgb, var(--purple) 55%, transparent);
   }
 }

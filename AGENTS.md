@@ -19,3 +19,8 @@ npm run build    # verifica build
 - Font self-hosted in `website/public/fonts/`
 
 Prima di dichiarare completo un lavoro sul sito: `npm run build` dentro `website/`.
+
+## Git
+
+- **Vietato fare commit e push se non richiesti esplicitamente dall'utente.**
+- Aggiornare solo file in locale; l'utente decide quando e se portare le modifiche su GitHub (nuova repo: `doublelayerprints/doublelayerprints.github.io`).

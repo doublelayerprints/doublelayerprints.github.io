@@ -1,0 +1,206 @@
+---
+/**
+ * Scena hero "Deposizione" — il pin che stampa l'hero strato per strato.
+ * Lo scroll dentro lo stage (~240svh) definisce il target di progresso
+ * (0→1) e il progresso VISIBLE lo insegue a ritmo macchina limitato,
+ * così anche uno scroll veloce lascia vedere gli strati (CAP 0.7/s:
+ * l'intera stampa attraversa in ~1.4s comunque si scrolli). Tutto
+ * scroll-linked; il JS è solo il clock, le trasformazioni nel CSS.
+ * Attiva solo con JS e senza preferenza ridotta; altrimenti statico.
+ */
+interface Props {
+  id?: string;
+}
+const { id } = Astro.props;
+---
+
+<script is:inline>
+  (function () {
+    var ok = false;
+    try {
+      ok = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+      ok = true;
+    }
+    if (ok) document.documentElement.setAttribute('data-motion-ok', '');
+  })();
+</script>
+
+<div class="hero-stage" data-hero-stage id={id}>
+  <div class="hero-scene" data-hero-scene>
+    <slot />
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    if (!root.hasAttribute('data-motion-ok')) return;
+    var stage = document.querySelector('[data-hero-stage]');
+    if (!stage) return;
+    var scene = stage.querySelector('[data-hero-scene]');
+    if (!scene) return;
+
+    var clamp = function (v, a, b) { return Math.min(Math.max(v, a), b); };
+    var wing = function (p, a, b) { return clamp((p - a) / (b - a), 0, 1); };
+    var ease = function (t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; };
+    var W = function (p, a, b) { return ease(wing(p, a, b)); };
+
+    var nav = document.querySelector('.nav');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.gcode .gl'));
+    var count = scene.querySelector('[data-count]');
+
+    var navH = 64;
+    var stageTop = 0;
+    var len = 1;
+
+    var measure = function () {
+      navH = nav ? nav.offsetHeight : 64;
+      scene.style.setProperty('--scene-top', navH + 'px');
+      stageTop = stage.getBoundingClientRect().top + window.scrollY;
+      len = Math.max(320, stage.offsetHeight - scene.offsetHeight);
+    };
+
+    var pad3 = function (n) { return String(n).padStart(3, '0'); };
+
+    /* Orologio della stampante: il target arriva dallo scroll, il
+       progresso visibile lo insegue con velocità limitata (CAP p/s)
+       e correttive snappy (K). Cap di 0.7: l'intera stampa occupa
+       ~1.4s anche con un scroll violento, quindi ogni strato si vede.
+       Fuori viewport si azzera (niente lavoro invisibile). */
+    var K = 20;
+    var CAP = 0.7;
+    var cur = 0;
+    var target = 0;
+    var raf = 0;
+    var last = 0;
+    var inView = true;
+
+    var apply = function (p) {
+      /* Stampa simultanea: foto e wordmark nella stessa finestra */
+      var pp = W(p, 0.15, 0.7);
+      var pw = pp;
+      var printEnd = 1 - W(p, 0.68, 0.9);
+      var photoGhost =
+        Math.min(1, pp * 5) * printEnd * Math.min(1, (1 - pp) * 40);
+      var kBed = Math.sin(W(p, 0.02, 0.28) * Math.PI);
+      var kGhost = W(p, 0.2, 0.5) * (1 - W(p, 0.9, 1));
+      var kPress = Math.sin(W(p, 0.68, 0.95) * Math.PI);
+      var kTilt = Math.sin(W(p, 0.15, 0.7) * Math.PI);
+
+      var s = scene.style;
+      s.setProperty('--p', p.toFixed(4));
+      s.setProperty('--pp', pp.toFixed(4));
+      s.setProperty('--pw', pw.toFixed(4));
+      s.setProperty('--k-photo-ghost', photoGhost.toFixed(4));
+      s.setProperty('--k-word-ghost', photoGhost.toFixed(4));
+      s.setProperty('--k-pfade', (1 - printEnd).toFixed(4));
+      s.setProperty('--k-wfade', (1 - printEnd).toFixed(4));
+      s.setProperty('--k-bed', kBed.toFixed(4));
+      s.setProperty('--k-ghost', kGhost.toFixed(4));
+      s.setProperty('--k-count', photoGhost.toFixed(4));
+      s.setProperty('--k-press', kPress.toFixed(4));
+      s.setProperty('--k-tilt', kTilt.toFixed(4));
+
+      if (count) {
+        var n = 1 + Math.round(39 * pp);
+        count.textContent = 'LAYER ' + pad3(n) + '/040';
+      }
+
+      if (rows.length) {
+        var active = clamp(Math.floor(pp * rows.length), 0, rows.length - 1);
+        for (var r = 0; r < rows.length; r++) {
+          rows[r].classList.toggle('exec', r === active);
+        }
+      }
+    };
+
+    var computeTarget = function () {
+      return clamp((window.scrollY + navH - stageTop) / len, 0, 1);
+    };
+
+    var stopLoop = function () {
+      if (raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      last = 0;
+    };
+
+    var tick = function (now) {
+      raf = 0;
+      var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
+      last = now;
+      var dist = target - cur;
+      var speed = Math.min(K * Math.abs(dist), CAP);
+      cur += Math.sign(dist) * Math.min(Math.abs(dist), speed * dt);
+      apply(cur);
+      if (Math.abs(target - cur) < 0.0008) {
+        cur = target;
+        apply(cur);
+        stopLoop();
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    var seek = function () {
+      target = computeTarget();
+      if (!inView) {
+        stopLoop();
+        cur = target;
+        apply(cur);
+        return;
+      }
+      if (!raf) {
+        last = 0;
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    var snap = function () {
+      measure();
+      target = computeTarget();
+      stopLoop();
+      cur = target;
+      apply(cur);
+    };
+
+    var tickingResize = false;
+    var onResize = function () {
+      if (tickingResize) return;
+      tickingResize = true;
+      requestAnimationFrame(function () {
+        tickingResize = false;
+        measure();
+        if (!raf) {
+          snap();
+        } else {
+          target = computeTarget();
+        }
+      });
+    };
+
+    stage.setAttribute('data-scene-live', '');
+    snap();
+    requestAnimationFrame(snap);
+    window.addEventListener('load', snap);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(snap);
+    }
+    window.addEventListener('scroll', seek, { passive: true });
+    window.addEventListener('resize', onResize);
+    if (window.ResizeObserver) {
+      new ResizeObserver(onResize).observe(document.documentElement);
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        function (entries) {
+          inView = entries[0].isIntersecting;
+          seek();
+        },
+        { rootMargin: '25% 0px 25% 0px' }
+      ).observe(stage);
+    }
+  })();
+</script>

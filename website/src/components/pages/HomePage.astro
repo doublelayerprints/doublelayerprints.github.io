@@ -6,6 +6,7 @@ import GCodeStrip from '../GCodeStrip.astro';
 import LayerLines from '../LayerLines.astro';
 import PageRail from '../PageRail.astro';
 import ProductPlate from '../ProductPlate.astro';
+import HeroScene from '../HeroScene.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
 import { pathFor, asset } from '../../i18n/utils';
 import { whatsappLink } from '../../consts';
@@ -38,30 +39,55 @@ const stepKey = (i: number, part: 'title' | 'text') =>
     ]}
   />
   <!-- ================= Hero ================= -->
-  <section class="hero" id="intro">
-    <div class="container hero__grid">
-      <GCodeStrip />
-      <div class="hero__text">
-        <Wordmark size="hero" />
-        <p class="hero__tagline anim-rise">{t('hero.tagline')}</p>
-        <div class="hero__cta anim-rise-late">
-          <a class="btn btn--solid" href={pathFor('lavori', lang)}>{t('hero.cta.works')}</a>
-          <a class="btn" href={pathFor('contatti', lang)}>{t('hero.cta.contact')}</a>
+  <HeroScene id="intro">
+    <section class="hero">
+      <div class="container hero__grid">
+        <GCodeStrip />
+        <div class="hero__text">
+          <Wordmark size="hero" printable />
+          <p class="hero__tagline anim-rise">{t('hero.tagline')}</p>
+          <div class="hero__cta anim-rise-late">
+            <a class="btn btn--solid" href={pathFor('lavori', lang)}>{t('hero.cta.works')}</a>
+            <a class="btn" href={pathFor('contatti', lang)}>{t('hero.cta.contact')}</a>
+          </div>
         </div>
+        <figure class="hero__photo" data-plate>
+          <span class="scene-count" data-count aria-hidden="true">LAYER 001/009</span>
+          <div class="hero__imgwrap">
+            <img
+              src={asset('images/studio-16.jpg')}
+              alt={t('hero.photoAlt')}
+              width="1600"
+              height="1200"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <div class="hero__bands" aria-hidden="true">
+              {
+                Array.from({ length: 20 }).map((_, i) => (
+                  <img
+                    class="hero__band"
+                    style={`--i:${i}`}
+                    src={asset('images/studio-16.jpg')}
+                    alt=""
+                    width="1600"
+                    height="1200"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))
+              }
+              <span class="print-head" aria-hidden="true"></span>
+            </div>
+            <span class="scene-bed" aria-hidden="true"></span>
+          </div>
+          <span class="hero__ghost" data-ghost="1" aria-hidden="true"></span>
+          <span class="hero__ghost" data-ghost="2" aria-hidden="true"></span>
+          <figcaption class="hero__caption">{t('hero.photoCaption')}</figcaption>
+        </figure>
       </div>
-      <figure class="hero__photo">
-        <img
-          src={asset('images/studio-16.jpg')}
-          alt={t('hero.photoAlt')}
-          width="1600"
-          height="1200"
-          fetchpriority="high"
-          decoding="async"
-        />
-        <figcaption class="hero__caption">{t('hero.photoCaption')}</figcaption>
-      </figure>
-    </div>
-  </section>
+    </section>
+  </HeroScene>
 
   <div class="container">
     <LayerLines hero />

@@ -62,12 +62,19 @@ Dal logo esistente (viola + giallo), riusata con disciplina. I token vivono in
 | Muted Lavender | `#625D6E` | Testo secondario, didascalie (5.6:1 su carta) |
 | Layer Line | `#D9D7DE` | Hairline chiare |
 | Layer Line Dark | `#C3C0CB` | Hairline marcate, bordi dei plate |
+| Mark Layer | `#FFCE00` | Fronte "LayeR" del wordmark — oro costante |
+| Mark Echo | `#472271` / `#8B68C9` | Eco viola dietro "LayeR" (giorno / notte) |
+| On-dark Muted | `#A39DAF` | "prints" del footer — costante su inchiostro |
 
 **Vincoli d'uso documentati:**
 
-- **L'oro non è mai testo su chiaro** (contrasto 1.31:1): solo elemento grafico
-  (eco del wordmark, layer line d'accento, bordi di focus su fondo scuro,
-  sottolineature animate).
+- **L'oro non è mai testo su chiaro** (contrasto 1.31:1): solo elemento
+  grafico (layer line d'accento, bordi di focus su fondo scuro,
+  sottolineature animate). **Eccezione da-logo (2026-10-13): la fronte
+  "LayeR" del wordmark è oro anche su chiaro** — è un logotipo, non testo
+  di lettura; l'eco viola dietro ne rinforza il contorno e il nome accessibile
+  resta nel testo `sr-only`. Spec:
+  `superpowers/specs/2026-10-13-wordmark-bicolore-uniforme-design.md`.
 - Il viola porta le azioni (`btn--solid`) e il primo strato del wordmark;
   su carta ha 8.2:1 di contrasto, verificato.
 - La selezione testo è oro su inchiostro (`::selection`): un dettaglio
@@ -93,10 +100,14 @@ dei soli token colore in `:root[data-theme='dark']`:
 | `--line` / `--line-dark` | `#D9D7DE` / `#C3C0CB` | `#2C2539` / `#37304A` | — |
 | `--focus` | `#5B2E91` (8.2:1) | `#FFCE00` (12.2:1) | — |
 | `--footer-bg` | `#241A30` | `#140F1D` | — |
+| `--mark-echo` | `#472271` | `#8B68C9` | 3.9:1 su ink footer, 4.4:1 su footer-bg (display) |
 
 Token trasversali (validi in entrambi i temi): `--purple-on-dark` `#8B68C9`
 (display wordmark su fondi ink, sempre) e `--on-dark-text` `#ECEAF0` (testo su
-fondi ink/footer, sempre). Il placeholder SVG dei pezzi esiste in due variabili
+fondi ink/footer, sempre). Nuovo per il wordmark bicolore (spec 2026-10-13):
+`--mark-layer` `#FFCE00` (fronte "LayeR", sempre) e `--on-dark-muted` `#A39DAF`
+("prints" su fondi sempre scuri, sempre). Il placeholder SVG dei pezzi esiste
+in due variabili
 (`*-dark.svg`) selezionate dai componenti via `[data-theme]` — dopo l'audit
 2026-10-12.
 
@@ -149,14 +160,14 @@ fragili per i font):
 
 ---
 
-## 6. I tre dispositivi di marca
+## 6. I dispositivi di marca
 
 ### 6.1 Wordmark a due strati (`Wordmark.astro`)
 
 Il logo come costruzione di stampa:
 
 - "Double" in Filament Purple;
-- "LayeR" in Nozzle Ink con **eco in Silk Gold** fuori registro di
+- "LayeR" in Silk Gold con **eco viola** fuori registro di
   `0.085em / 0.05em` — il "layer shift" che ogni stampatore conosce;
 - al caricamento, l'eco parte più disallineata `(0.42em, -0.18em)` e **si
   mette in registro** in 750ms (`echo-register`, `var(--ease-snap)`): il
@@ -237,13 +248,71 @@ Progressive enhancement: senza JS restano anchor native e strati equidistanti;
 con JS la misura è ricalcolata a init, `load`, `fonts.ready` e `resize`. Solo
 JS vanilla, come filtri, menu e tema.
 
+### 6.5 La scena "Deposizione" (`HeroScene.astro`)
+
+**Aggiunta 2026-10-13** (spec completa e registro del tuning:
+[`docs/superpowers/specs/2026-10-13-hero-scroll-deposizione-design.md`](./superpowers/specs/2026-10-13-hero-scroll-deposizione-design.md)).
+L'home diventa dinamica nel **solo hero**: la prima sezione si trasforma in una
+scena scroll-pinned che **stampa se stessa strato per strato**. A riposo (load e
+fine scena) l'hero è identico a quello descritto sopra; il resto della home e
+le altre pagine restano immutati.
+
+**La storia.** Il pin (`position: sticky` dentro uno stage ~240svh) tiene l'hero
+in scena per ~1.4 viewport di scroll. Il progresso `p` (0→1) guida:
+
+1. **Bed** (p 2–28%): la riga corrente del G-code si accende e avanza
+   (`.gl.exec`), una hairline oro attraversa il bordo superiore della foto —
+   la stessa lingua della testa della rail.
+2. **Stampa simultanea foto + wordmark** (p 15–70%): la base passa in
+   "anteprima slicer" (wireframe tenue) e **20 fasce della foto** e **20 slice
+   del wordmark** si depositano dal basso verso l'alto (FDM): ognuna scende da
+   −26px (foto, con micro-sfasamento alternato) o −0.32em (scritta) nel proprio
+   posto; due teste d'oro risalgono i bordi; contatore mono `LAYER 000/040` e
+   righe di G-code in esecuzione sincronizzate alla stessa finestra.
+3. **Fusione finale** (p 68–90%): le fasce si sciolgono nell'originale
+   (cross-fade a pixel identici, zero seams), le scritte tornano piene.
+4. **Pressione del piatto** (p 68–95%): tagline e CTA subiscono una
+   depressione di 7/9px e tornano a registro; plate-fantasma (paper-dim + viola) sotto la
+   foto restituiscono lo spessore dell'oggetto ("double layer" reso visibile).
+
+**Orologio macchina.** Il target di progresso arriva dallo scroll, ma il
+progresso **visibile** lo insegue a velocità limitata (`CAP = 0.7` p/s, `K = 20`
+per le correzioni piccole): anche uno scroll violento attraversa l'intera
+stampa in ~1.4s e ogni strato si vede; la scena è reversibile allo scroll
+inverso (ristampa a ritmo macchina). Fuori viewport (`IntersectionObserver`)
+il progresso si azzera. Nota di onestà: un primo tentativo di "blocco
+macchina" via wheel-jack (pagina parcheggiata nel pin, fling convertita in
+intento consumato a ritmo macchina) è stato **tentato e scartato** dopo due
+round di fix non sufficienti (momentum morto al primo `preventDefault` su
+Safari, ping-pong ai confini): i dettagli sono nell'addendum della spec.
+
+**Ingegneria.** `HeroScene` avvolge l'hero senza modificarne il markup
+(`hero-stage` > `hero-scene` sticky > slot): il JS (IIFE inline, ~150 righe,
+stesso pattern della rail) è solo il clock e scrive CSS vars sulla scena
+(`--pp`, `--pw`, `--k-*`); **tutte le trasformazioni vivono nel CSS**
+(`global.css` sezione scena + regole vive in `Wordmark.astro`): clamp()
+calcolate da var, clip-path per fasce/slice, `will-change` solo su pochi
+nodi. Il wordmark porta la variante `printable` (20 copie tagliate + testa
+d'oro); il G-code porta le righe wrappate `.gl`; la foto 20 fasce (stesso
+src, un solo download) + `print-head` + `scene-bed` + `scene-count`.
+
+**Robustezza.** `data-motion-ok` è pre-paint e solo con JS +
+`prefers-reduced-motion: no-preference` (schema no-flash del tema): senza
+uno dei due l'attributo `data-scene-live` non viene mai messo, lo stage
+resta alto quanto l'hero e **la pagina è esattamente quella di sempre**.
+Mobile <760px: niente pin — resta solo una coda leggera (tilt foto, eco,
+pressione CTA) sulla struttura a colonna. Tema Notturno: solo token
+costanti (oro, viola). `#intro` vive sullo stage: la rail continua a
+puntare alla sezione giusta e ricalibra da sola via `ResizeObserver`.
+Zero dipendenze, zero stringhe i18n nuove, zero contenuti modificati.
+
 ---
 
 ## 7. Struttura del sito
 
 | Rotta IT | Rotta EN | Contenuto |
 |---|---|---|
-| `/` | `/en/` | Hero (wordmark, tagline, CTA, foto laboratorio, G-code), Lavori selezionati, Come lavoriamo (01–03), teaser Chi siamo, banda contatti |
+| `/` | `/en/` | **Scena "Deposizione"** (§6.5: hero stampato strato per strato nel pin), poi Lavori selezionati, Come lavoriamo (01–03), teaser Chi siamo, banda contatti |
 | `/lavori/` | `/en/works/` | Titolo, intro, filtri per categoria (chips, vanilla JS), griglia 6 pezzi |
 | `/lavori/[slug]/` | `/en/works/[slug]/` | Foto (principale + thumbs), categoria, titolo, descrizione, tabella specifiche mono, CTA WhatsApp precompilata, banda contatti |
 | `/chi-siamo/` | `/en/about/` | Storia in 3 paragrafi, foto laboratorio, le due stampanti con descrizione, banda contatti |
@@ -312,6 +381,9 @@ JS vanilla, come filtri, menu e tema.
 | Fonte rail | Ispirazione interattiva: **getartcraft.com/apps** (slot titoli + progresso + tacchette) | Interazione studiata sul loro sito, esecuzione tutta "Layer by layer" (strati FDM, G-code, oro) — §6.4 |
 | `generateId` custom nella collection | Mantenere `slug.it.md` con punto | Slug puliti e condivisi tra le lingue |
 | `render(entry)` scartata | `set:html={entry.rendered.html}` | Il glob loader pre-renderizza il markdown; `render()` falliva su questo setup |
+| Scena hero dinamica | **"Deposizione"** (`HeroScene`): 20+20 strati, stampata simultanea, clock limitato | Requisito dell'utente: home dinamica tipo "le scritte/l'immagine si stampano a strati"; §6.5, spec addendum del 2026-10-13 |
+| Blocco macchina (wheel-jack) | **Scartato** dopo due round di fix | Momentum nativo che muore al `preventDefault`, ping-pong ai confini: troppo fragile per un sito di produzione; resta il clock limitato come mitigazione dello scroll veloce |
+| Wordmark bicolore | Double viola, "LayeR" oro + eco viola (`--mark-*`), prints grigino | Richiesta di uniformità dell'utente (il quasi-bianco "si vedeva poco" nel Notturno); token per tema da spec 2026-10-13 |
 
 ---
 
@@ -346,7 +418,8 @@ Cluster di default AI-generated, e cosa fa il sito al loro posto:
   layer lines statiche).
 - Contrasti misurati (chiaro): viola/carta 8.2:1, inchiostro/carta 14.6:1,
   muted/carta 5.56:1, bianco/viola 9.4:1, oro/ink 11.1:1. (Notturno): testo
-  15.2:1, link 6.4:1, muted 6.9:1, oro 12.2:1, focus 12.2:1.
+  15.2:1, link 6.4:1, muted 6.9:1, oro 12.2:1, focus 12.2:1, fronte "LayeR"
+  oro 12.2:1. Eccezione da-logo documentata in §3 per il wordmark su chiaro.
 - I due difetti P0 del primo round (focus ring oro su chiaro 1.31:1 e
   "Double" del footer viola su ink 1.77:1) sono **risolti** in fase 1
   (`IMPROVEMENTS.md`).
@@ -366,3 +439,4 @@ Cluster di default AI-generated, e cosa fa il sito al loro posto:
 | Nuovo pezzo | `website/src/content/works/<slug>.{it,en}.md` + foto in `public/images/works/` |
 | Placeholder | `website/scripts/gen-placeholders.mjs` (`npm run placeholders`) |
 | Wordmark/layer lines/G-code | `website/src/components/{Wordmark,LayerLines,GCodeStrip}.astro` |
+| Scena "Deposizione" (pin, clock, fasce, slice, testine) | `website/src/components/HeroScene.astro` + sezione scena in `global.css` (`Wordmark` variante `printable`; `GCodeStrip` righe `.gl`) |
