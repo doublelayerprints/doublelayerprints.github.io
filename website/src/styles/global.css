@@ -553,19 +553,14 @@ h4 {
   .hero-stage[data-scene-live] .hero-scene > .hero {
     width: 100%;
   }
-  .hero-stage[data-scene-live] .hero__grid {
-    perspective: 1000px;
-  }
 }
 
-/* Plate foto: si inclina e si solleva in 3D dentro la sua finestra */
+/* Plate foto: fermo in posizione — nessuna rotazione d'asse (richiesta
+   2026-10-13: l'immagine resta fissa); l'effetto strato vive dentro la
+   piastra, nelle fasce che depositano, non nel gesto del plate. */
 .hero-stage[data-scene-live] .hero__photo {
   position: relative;
   z-index: 0;
-  transform: translateY(calc(var(--k-tilt, 0) * -18px))
-    rotateX(calc(var(--k-tilt, 0) * 12deg));
-  transform-origin: center bottom;
-  will-change: transform;
 }
 
 /* La foto passa in "anteprima slicer": l'originale si affievolisce
@@ -605,10 +600,12 @@ h4 {
   pointer-events: none;
 }
 
-/* Fasce della foto: 6 strati che si depositano dal basso (FDM).
-   La maschera clip-path per fascia e il deposito derivano da
-   --pp / --i / --n, allineati al wordmark. Foto, bed e contatore
-   guardano solo ≥760px: sotto resta la coda leggera. */
+/* Fasce della foto: 40 strati sottili che si depositano dal basso
+   (FDM, più fin di prima su richiesta del 2026-10-13). La maschera
+   clip-path per fascia e il deposito derivano da --pp / --i / --n,
+   allineati al wordmark. Il var --n qui è la fonte: i default dei
+   figli si leggono solo se il nodo padre non c'è. Foto, bed e
+   contatore guardano solo ≥760px: sotto resta la coda leggera. */
 .hero__imgwrap {
   position: relative;
   overflow: hidden;
@@ -623,7 +620,7 @@ h4 {
   z-index: 3;
   overflow: hidden;
   pointer-events: none;
-  --n: 20;
+  --n: 40;
 }
 .hero__band {
   position: absolute;
@@ -650,14 +647,6 @@ h4 {
   transform: translateY(calc(var(--k-press, 0) * 9px));
 }
 
-/* Pressione della piastra su scritta e CTA (più marcata) */
-.hero-stage[data-scene-live] .hero__tagline {
-  transform: translateY(calc(var(--k-press, 0) * 7px));
-}
-.hero-stage[data-scene-live] .hero__cta {
-  transform: translateY(calc(var(--k-press, 0) * 9px));
-}
-
 @media (min-width: 760px) {
   .hero-stage[data-scene-live] .scene-bed {
     width: calc(var(--k-bed, 0) * 100%);
@@ -668,45 +657,58 @@ h4 {
   }
 
   /* Le fasce della foto: ognuna copia la propria banda con
-     clip-path, scende da -26px e si deposita bottom-up. */
+      clip-path, scende da -26px e si deposita bottom-up. */
   .hero-stage[data-scene-live] .hero__band {
     will-change: transform, opacity;
     clip-path: inset(
-      calc((1 - (var(--i, 0) + 1) / var(--n, 20)) * 100%) 0
-        calc(var(--i, 0) / var(--n, 20) * 100%) 0
+      calc((1 - (var(--i, 0) + 1) / var(--n, 40)) * 100%) 0
+        calc(var(--i, 0) / var(--n, 40) * 100%) 0
     );
     opacity: calc(
-      clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1) *
+      clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1) *
         (1 - var(--k-pfade, 0))
     );
     transform: translateY(
-      calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -26px)
+      calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
     );
   }
   .hero-stage[data-scene-live] .hero__band:nth-child(odd) {
     transform: translateY(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -26px)
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
       )
       translateX(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * 9px)
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * 9px)
       );
   }
   .hero-stage[data-scene-live] .hero__band:nth-child(even) {
     transform: translateY(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -26px)
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
       )
       translateX(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 20) - var(--i, 0)), 1)) * -9px)
+        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -9px)
       );
   }
 
-  /* Il frontier della stampa: la testa d'oro risale la foto */
-  .hero-stage[data-scene-live] .print-head {
-    bottom: calc(var(--pp, 0) * 100%);
-    opacity: var(--k-photo-ghost, 0);
+  /* Niente strato oltre la testa d'oro: il contenitore delle fasce è
+     tagliato alla linea della print-head — il nuovo strato nasce sotto
+     la linea, come in una stampa vera. La testa è sorella di .hero__bands
+     (dentro .hero__imgwrap) per non finire tagliata lei stessa. */
+  .hero-stage[data-scene-live] .hero__bands {
+    clip-path: inset(calc((1 - var(--pp, 0)) * 100%) 0 0 0);
   }
 
-  /* Plate fantasma sotto la foto: lo spessore steso dell'oggetto */
+  /* Il frontier della stampa: la testa d'oro risale la foto.
+     Vita propria solo durante la finestra di stampa (--k-head),
+     mai durante la dissolvenza che la precede. */
+  .hero-stage[data-scene-live] .print-head {
+    bottom: calc(var(--pp, 0) * 100%);
+    opacity: var(--k-head, 0);
+  }
+
+  /* Plate fantasma sotto la foto: lo spessore steso dell'oggetto.
+     La deriva è orizzontale (layer shift ai lati, come le fasce con
+     il loro micro-offset X): non verticale, onde evitare che il
+     plate vada a sbattere sopra la didascalia (fix 2026-10-13). */
   .hero__ghost {
     position: absolute;
     top: 0.55rem;
@@ -720,13 +722,13 @@ h4 {
     opacity: var(--k-ghost, 0);
   }
   .hero-stage[data-scene-live] .hero__ghost[data-ghost='1'] {
-    translate: 0 calc(var(--k-ghost, 0) * 16px);
+    translate: calc(var(--k-ghost, 0) * 14px) 0;
     scale: 0.975;
     background: var(--paper-dim);
     border: 1px solid var(--line-dark);
   }
   .hero-stage[data-scene-live] .hero__ghost[data-ghost='2'] {
-    translate: 0 calc(var(--k-ghost, 0) * 30px);
+    translate: calc(var(--k-ghost, 0) * -14px) 0;
     scale: 0.95;
     background: color-mix(in srgb, var(--purple) 12%, var(--paper-dim));
     border: 1px solid color-mix(in srgb, var(--purple) 55%, transparent);

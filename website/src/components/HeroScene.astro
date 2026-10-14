@@ -79,34 +79,40 @@ const { id } = Astro.props;
     var inView = true;
 
     var apply = function (p) {
-      /* Stampa simultanea: foto e wordmark nella stessa finestra */
-      var pp = W(p, 0.15, 0.7);
-      var pw = pp;
-      var printEnd = 1 - W(p, 0.68, 0.9);
-      var photoGhost =
-        Math.min(1, pp * 5) * printEnd * Math.min(1, (1 - pp) * 40);
-      var kBed = Math.sin(W(p, 0.02, 0.28) * Math.PI);
-      var kGhost = W(p, 0.2, 0.5) * (1 - W(p, 0.9, 1));
+      /* Finestre scena: 10–24% cancella il materiale (foto + scritta —
+         l'inchiostro scivola su −14px mentre svanisce), 4–26% il bed
+         si arma, 28–60% la finestra di stampa (foto E scritta, a
+         strati con anteprima al registro, testa viva solo lì, il
+         contatore e la riga G-code in esecuzione), 68–90% rilascio
+         (l'inchiostro torna pieno, le fasce svaniscono). I
+         plate-ghost vivono SOLO nella finestra di dissolvenza.
+         Stima coerente per la scritta: h 2026-10-13 — niente arrivi
+         scivolanti, i glifi si riempiono a registro. */
+      var pFade = W(p, 0.10, 0.24);
+      var pp = W(p, 0.28, 0.60);
+      var printEnd = 1 - W(p, 0.68, 0.90);
+      var photoGhost = pFade * printEnd;
+      var kBed = Math.sin(W(p, 0.04, 0.26) * Math.PI);
+      var kGhost = Math.sin(W(p, 0.10, 0.24) * Math.PI);
       var kPress = Math.sin(W(p, 0.68, 0.95) * Math.PI);
-      var kTilt = Math.sin(W(p, 0.15, 0.7) * Math.PI);
+      var kHead = Math.min(1, pp * 8) * printEnd;
+      var kWordGhost = pFade * printEnd;
 
       var s = scene.style;
       s.setProperty('--p', p.toFixed(4));
       s.setProperty('--pp', pp.toFixed(4));
-      s.setProperty('--pw', pw.toFixed(4));
       s.setProperty('--k-photo-ghost', photoGhost.toFixed(4));
-      s.setProperty('--k-word-ghost', photoGhost.toFixed(4));
+      s.setProperty('--k-word-ghost', kWordGhost.toFixed(4));
       s.setProperty('--k-pfade', (1 - printEnd).toFixed(4));
-      s.setProperty('--k-wfade', (1 - printEnd).toFixed(4));
       s.setProperty('--k-bed', kBed.toFixed(4));
       s.setProperty('--k-ghost', kGhost.toFixed(4));
-      s.setProperty('--k-count', photoGhost.toFixed(4));
+      s.setProperty('--k-count', kHead.toFixed(4));
+      s.setProperty('--k-head', kHead.toFixed(4));
       s.setProperty('--k-press', kPress.toFixed(4));
-      s.setProperty('--k-tilt', kTilt.toFixed(4));
 
       if (count) {
-        var n = 1 + Math.round(39 * pp);
-        count.textContent = 'LAYER ' + pad3(n) + '/040';
+        var n = 1 + Math.round(79 * pp);
+        count.textContent = 'LAYER ' + pad3(n) + '/080';
       }
 
       if (rows.length) {

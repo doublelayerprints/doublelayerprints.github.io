@@ -55,7 +55,7 @@ const sections: Array<{ id: string; label: UIKey }> = [
           </div>
         </div>
         <figure class="hero__photo" data-plate>
-          <span class="scene-count" data-count aria-hidden="true">LAYER 001/009</span>
+          <span class="scene-count" data-count aria-hidden="true">LAYER 001/080</span>
           <div class="hero__imgwrap">
             <img
               src={asset('images/studio-16.jpg')}
@@ -67,7 +67,7 @@ const sections: Array<{ id: string; label: UIKey }> = [
             />
             <div class="hero__bands" aria-hidden="true">
               {
-                Array.from({ length: 20 }).map((_, i) => (
+                Array.from({ length: 40 }).map((_, i) => (
                   <img
                     class="hero__band"
                     style={`--i:${i}`}
@@ -80,10 +80,10 @@ const sections: Array<{ id: string; label: UIKey }> = [
                   />
                 ))
               }
-              <span class="print-head" aria-hidden="true"></span>
             </div>
-            <span class="scene-bed" aria-hidden="true"></span>
+            <span class="print-head" aria-hidden="true"></span>
           </div>
+          <span class="scene-bed" aria-hidden="true"></span>
           <span class="hero__ghost" data-ghost="1" aria-hidden="true"></span>
           <span class="hero__ghost" data-ghost="2" aria-hidden="true"></span>
           <figcaption class="hero__caption">{t('hero.photoCaption')}</figcaption>

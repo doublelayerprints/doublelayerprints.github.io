@@ -6,11 +6,12 @@
  * che si mette in registro al caricamento della pagina.
  * In hero è l'h1 della pagina; altrove (footer) è testo semplice.
  *
- * Variante `printable`: porta lo stack dello slicer — 20 copie
- * del wordmark tagliate orizzontalmente, che durante la scena
- * "Deposizione" depositano dal basso verso l'alto, con la testa
- * d'oro che risale il blocco. È aria residua: senza la scena
- * (no JS, reduced-motion) restano opacity 0, invisibili.
+ * Variante `printable`: lo stack dello slicer — 40 copie del
+ * wordmark tagliate a strati che durante la scena "Deposizione"
+ * si depositano bottom-up (2026-10-13 h: ripristino dello slicing
+ * della scritta; l'arrivo di ogni strato NON scivola: solo
+ * dissolvenza in registro, così i glifi non si leggono mai
+ * "tagliati"). Aria residua: senza scena restano opacity 0.
  */
 interface Props {
   size?: 'hero' | 'footer';
@@ -19,7 +20,7 @@ interface Props {
 }
 const { size = 'hero', onDark = false, printable = false } = Astro.props;
 const Tag = size === 'hero' ? 'h1' : 'p';
-const N_SLICES = 20;
+const N_SLICES = 40;
 ---
 
 <Tag class:list={['mark', `mark--${size}`, { 'mark--on-dark': onDark }]}>
@@ -42,10 +43,10 @@ const N_SLICES = 20;
               <span class="mark__slice-sub">prints</span>
             </span>
           ))}
-          <span class="mark__print-head" aria-hidden="true"></span>
         </span>
       )
     }
+    {printable && <span class="mark__print-head" aria-hidden="true"></span>}
   </span>
 </Tag>
 
@@ -58,8 +59,16 @@ const N_SLICES = 20;
     text-wrap: nowrap;
   }
 
+  /* Spazio per l'inchiostro che sborda dal box di layout: il bowl della
+     "e" di "Double" e le aste alte di "D/b/l" (line-height 0.94) escono
+     di 2–3px; senza padding, le copie a strati (clip-path a inset 0
+     orizzontale) le tagliano durante la scena. Il margin-top compensa:
+     il layout visivo resta identico al avere. (Soluzione 2, 2026-10-13). */
   .mark--hero .mark__visual {
     position: relative;
+    padding-top: 0.05em; /* le aste alte non vengono rasentate */
+    margin-top: -0.05em; /* compensazione: nulla si sposta */
+    padding-right: 0.08em; /* il bowl della "e" respira */
   }
 
   .mark__visual {
@@ -146,18 +155,49 @@ const N_SLICES = 20;
     isolation: isolate;
   }
 
-  /* ---- Stack dello slicer: copie a fasce del wordmark ---- */
+  /* Il momento coreografato: l'eco si mette in registro */
+  @keyframes echo-register {
+    from {
+      transform: translate(0.42em, -0.18em);
+      opacity: 0;
+    }
+    55% {
+      opacity: 1;
+    }
+    to {
+      transform: translate(
+        calc(0.085em + var(--echo-spread, 0em)),
+        calc(0.05em + var(--echo-spread, 0em) * 0.55)
+      );
+      opacity: 1;
+    }
+  }
+
+  /* Lo stack dello slicer: copie a strati del wordmark (2026-10-13 h).
+     Ogni strato: la propria banda con clip-path e dissolvenza legata
+     al progresso (--pp), SENZA movimento di arrivo — la scritta si
+     riempie a registro, mai mezza lettera fuori sede. Il contenitore
+     è tagliato alla linea della testa (niente strato sopra, come la
+     foto: `--k-photo-ghost`-gemello); la testa è sorella dello stack
+     per non venire tagliata lei stessa. Ink: sparisce in dissolvenza e
+     torna piena al rilascio (slide −14px ∝ ghost). */
   .mark__slicestack {
     position: absolute;
     inset: 0;
     display: block;
-    --n: 20;
+    --n: 40;
   }
   .mark__slice {
     position: absolute;
     inset: 0;
     display: block;
     opacity: 0;
+    pointer-events: none;
+    /* Le copie sono inset: 0 e non ereditano il padding per far fluire
+       il testo interno: stessе correzioni del base, altrimenti gli
+       strati starebbero sfalsati rispetto all'inchiostro di riposo. */
+    padding-top: 0.05em;
+    padding-right: 0.08em;
   }
   .mark__slice-a,
   .mark__slice-b,
@@ -186,54 +226,44 @@ const N_SLICES = 20;
     height: 2px;
     background: var(--gold);
     opacity: 0;
+    pointer-events: none;
   }
 
-  /* Il momento coreografato: l'eco si mette in registro */
-  @keyframes echo-register {
-    from {
-      transform: translate(0.42em, -0.18em);
-      opacity: 0;
-    }
-    55% {
-      opacity: 1;
-    }
-    to {
-      transform: translate(
-        calc(0.085em + var(--echo-spread, 0em)),
-        calc(0.05em + var(--echo-spread, 0em) * 0.55)
-      );
-      opacity: 1;
-    }
+  /* ---- Scena "Deposizione": lo slicing della scritta (h) ---- */
+  :global(.hero-stage[data-scene-live]) .mark__slicestack {
+    /* Il vincolo orizzontale a 0 tagliava l'ink overflow dei glifi
+       (la pancia della "e" di Clash Display esce dal box di layout,
+       2026-10-13 i): −0.15em ai lati lascia respirare la scritta,
+       −0.1em sotto copre i discendenti — il lavoro verticale resta
+       intatto (strato per strato). */
+    clip-path: inset(calc((1 - var(--pp, 0)) * 100%) -0.15em -0.1em -0.15em);
+    will-change: clip-path;
+  }
+  :global(.hero-stage[data-scene-live]) .mark__slice {
+    opacity: calc(
+      clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1) *
+        (1 - var(--k-pfade, 0))
+    );
+    clip-path: inset(
+      calc((1 - (var(--i, 0) + 1) / var(--n, 40)) * 100%) -0.15em
+        calc(var(--i, 0) / var(--n, 40) * 100%) -0.15em
+    );
+  }
+  :global(.hero-stage[data-scene-live]) .mark__print-head {
+    bottom: calc(var(--pp, 0) * 100%);
+    /* Vita propria solo durante la stampa (--k-head), come la gemella
+       della foto; mai durante la dissolvenza che la precede. */
+    opacity: var(--k-head, 0);
   }
 
-  /* ---- Scena "Deposizione": il wordmark si stampa dal basso.
-     Base in ghost slicer mentre le fasce depositano; la testa
-     d'oro risale il blocco e al rilascio tutto torna pieno. ---- */
+  :global(.hero-stage[data-scene-live]) .mark__visual {
+    translate: 0 calc(var(--k-word-ghost, 0) * -14px);
+    will-change: translate;
+  }
   :global(.hero-stage[data-scene-live]) .mark__a,
   :global(.hero-stage[data-scene-live]) .mark__b,
   :global(.hero-stage[data-scene-live]) .mark__sub {
     opacity: calc(1 - var(--k-word-ghost, 0));
-  }
-  :global(.hero-stage[data-scene-live]) .mark__slice {
-    opacity: calc(
-      clamp(0, calc(var(--pw, 0) * var(--n, 20) - var(--i, 0)), 1) *
-        (1 - var(--k-wfade, 0))
-    );
-    transform: translateY(
-      calc(
-        (1 - clamp(0, calc(var(--pw, 0) * var(--n, 20) - var(--i, 0)), 1)) *
-          -0.32em
-      )
-    );
-    will-change: transform, opacity;
-    clip-path: inset(
-      calc((1 - (var(--i, 0) + 1) / var(--n, 20)) * 100%) 0
-        calc(var(--i, 0) / var(--n, 20) * 100%) 0
-    );
-  }
-  :global(.hero-stage[data-scene-live]) .mark__print-head {
-    bottom: calc(var(--pw, 0) * 100%);
-    opacity: var(--k-word-ghost, 0);
   }
 
   @media (prefers-reduced-motion: no-preference) {

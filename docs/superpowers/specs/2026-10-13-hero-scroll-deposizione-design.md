@@ -157,3 +157,156 @@ ripiego durante il tuning: 1 immagine + maschere/overlay a fasce.
   Il rischio di bug su un portfolio di produzione prevale sul
   beneficio; resta il clock limitato sopra descritto come mitigazione
   dello scroll veloce.
+
+## Addendum 2026-10-13 b — plate fermo
+
+Richiesta del committente: durante la scena l'immagine non deve ruotare
+sull'asse X ("la voglio tenere fissa con l'effetto layer"). Rimosso il
+tilt del plate foto (rotateX 12° + sollevamento −18px via `--k-tilt`) e
+la `perspective` sul grid che gli serviva; l'effetto strato resta nelle
+fasce che depositano dentro la piastra. `--k-tilt` tolto anche dal
+clock (`HeroScene.astro`): nessuna regola lo consuma più.
+Mobile <760px e reduced-motion non cambiano (la scena lì è già spenta).
+
+## Addendum 2026-10-13 c — plate-ghost, testa e strati più fin
+
+Tre correzioni su prova reale (screenshot del committente a LAYER 032):
+
+1. **Sovrapposizione sul caption**: i plate-ghost scivola-vano in
+   verticale (+16/+30px) e finivano sopra la didascalia. Ora la deriva
+   è orizzontale (±14px, il layer-shift ai lati — stessa cifra del
+   micro-offset X delle fasce ±9px): lo "spessore dell'oggetto" resta,
+   la didascalia è sempre libera (verificato in CDP: bottom del ghost
+   10px sopra il fondo dell'immagine, intersezione = false a p .45/.62/.78).
+2. **Niente strato oltre la testa**: prima la clip era per-fascia e lo
+   strato successivo, cadendo da −26px, passava sopra la linea d'oro.
+   Ora il **contenitore** delle fasce è tagliato alla testa
+   (`.hero__bands` e `.mark__slicestack`: `clip-path: inset((1−p)·100% …)`);
+   le testine d'oro sono diventate sorelle dei contenitori
+   (in `.hero__imgwrap` / `.mark__visual`) per non finire tagliate loro.
+   Il nuovo strato nasce solo sotto la linea, foto e titolo.
+3. **Strati più fin**: 20→40 fasce foto e 20→40 slice del wordmark
+   (`--n: 40`, monospaziato con i contatori): barra `LAYER n/080`.
+
+## Addendum 2026-10-13 d — prima il vuoto, poi la stampa
+
+Due correzioni su verifica reale dello slicing:
+
+1. **"Prima scompare, poi stampa"**: materiale (foto + wordmark) e stampa
+   condividevano la stessa finestra — a LAYER 013 il materiale ancora
+   dissolvenzato era visibile mentre la testa già tagliava. Nuove
+   finestre in `HeroScene`: 10–24% dissolvenza del materiale, 4–26% bed,
+   28–70% finestra di stampa, 68–90% rilascio. Le testine d'oro (+
+   contatore) vivono solo nella finestra di stampa (var `--k-head`).
+2. **Riquadro viola nel vuoto**: i plate-ghost avevano vita per tutta la
+   scena e restavano visibili nel vuoto di stampa sopra la linea. Ora
+   il respiro è agganciato alla finestra di dissolvenza
+   (`sin(W(p, .10, .24)·π)`) — una volta pronti svaniscono e il vuoto
+   di stampa è fondo pulito.
+
+Verifica CDP a p .06/.17/.26/.44: dissolvenza senza teste né contatori
+(op. 0), a fine dissolvenza foto/word/ghost = 0 e testa appena accesa,
+a metà stampa testa a 1 e linea a ~33%, caption sempre pulita.
+
+## Addendum 2026-10-13 e — la scritta non si legge "tagliata"
+
+In nascent: durante la stampa la testa risaliva il blocco del wordmark
+tagliando il capo dei glifi (l'"e" di Double rasentata a metà lettera,
+in salita e in discesa). Due strumenti:
+
+1. **Bozza da slicer**: durante la stampa la scritta resta visibile a
+   opacità 0.14 (la "eco" già nel LESSICO del wordmark) — i glifi non
+   scompaiono mai nella forma, la testa "recupera" l'inchiostro sopra
+   la bozza. La formula `opacity: calc(0.14 + (1 − var(--k-word-ghost))
+   · 0.86)` dà 1 a riposo e senza JS (identità a tutto il resto).
+2. **Linea a battute di strato**: la testa del wordmark e la clip dello
+   stack snappano a `--pw-snap` (scritta dal JS: floor(pw·40)+1 su 40):
+   l'avanzamento è strato per strato, la separazione d'ingresso non
+   attraversa mai il glifo a metà del suo strato. Foto: resta continua
+   (il vuoto della foto non legge come "lettera tagliata").
+
+Verifica CDP a pw ~0.87 in salita e discesa: glifi interi, bozza sopra
+la linea, linea a battuta di strato; build ok.
+
+## Addendum 2026-10-13 f — la firma torna a essere una firma
+
+Anche con il ritaglio a strati e la bozza (addendum e) la riga dentro
+i glifi si leggeva come bug (screenshot utente a LAYER 064: "Double"
+mezza attraversata). Decisione: per il wordmark l'printing a fasce è
+finito si torna all'intenzione originale della spec §3 — il nome è
+**la firma a fine stampa**:
+
+- Tolto lo stack di 40 slice e la testa del wordmark (DOM e CSS).
+- Finestra firma 61–67%: il wordmark torna INTERO come uno strato
+  unico che deposita dall'alto (fade + discesa −14px, entrambi
+  proporzionali a --k-word-ghost): glifi mai tagliati, in nessuna
+  direzione.
+- Finestra di stampa foto compressa a 28–60%; il bed resta 4–26%;
+  dissolvenza 10–24%; rilascio 68–90%.
+- `printable` su `Wordmark` resta un prop inerte per compatibilità;
+  i var `--pw`, `--pw-snap`, `--k-wfade` sono spariti.
+
+Verifica CDP a p .06/.18/.45/.635/.72/.80: a riposo tutto intero;
+in dissolvenza scritta e foto svaniscono insieme (slide −8.9px);
+in stampa scritta ASSENTE e foto sotto la testa; alla firma parole
+piene che scendono in posto; al rilascio foto torna piena.
+
+## Addendum 2026-10-13 g — la scritta torna subito, non alla firma
+
+Il committente: durante la stampa la scritta sparisce per tutta la
+finestra — la vuole visibile. Finestra firma 61–67% antecipata a
+**25.5–29.5%**: appena la dissolvenza è finita (24%), il wordmark
+depona intero (unico strato, fade + discesa −14px) e resta pieno per
+TUTTA la stampa. Al primo istante di stampa (28%) è già su testo
+pieno; la foto si ritaglia da sola con la testa. Verificato con CDP
+a p .10/.27/.34/.45/.62: scritta piena durante tutti gli strati,
+deposito concluso all'apertura della finestra di stampa, nessun
+taglio possibile sui glifi.
+
+## Addendum 2026-10-13 h — lo slicing della scritta, senza disallineamenti
+
+Il committente: lo slicing della scritta deve stare (era sparito con
+il blocco unico f/g). La radice del difetto d'"e tagliata" era
+l'ARRIVO di ogni strata che scivolava da −0.32em: glifi a metà
+fuori registro rispetto agli strati già stampati. Ripristinato lo
+stack a 40 copie + contenitore confinato alla testa (clip) +
+testa sorella, con le correzioni al posto giusto:
+
+- arrivo SENZA traslazione: lo strato si dissolvenza dentro la sua
+  banda a registro (sliceTransform none in CDP a tre stadi);
+- inchiostro base assente per tutta la stampa (si dissolvenza con la
+  foto e torna pieno al rilascio con slide −14px ∝ ghost);
+- contenitore di scanalatura e testa come la foto (--pp continuo).
+
+Verifica CDP a pp .07/.56/.97: 40 strati, clip 93→3%, testa 0.57→1,
+LAYER 007→078; screenshot: strati visibili nei glifi, niente lettere
+mezza disallineate.
+
+## Addendum 2026-10-13 i — inchiostro che sborda dal box
+
+L'inchiostro di Clash Display sborda dal box di layout (il bowl della
+"e" di Double sporge a destra; le aste alte di D/b/l superano il top
+perché line-height 0.94 nega negligible lo spazio del measurement);
+le copie a strati con inset 0 orizzontale lo tagliavano in scena.
+Soluzione 2 (committente): padding di respiro sul box (.mark__visual:
+padding-top 0.05em, padding-right 0.08em, margin-top −0.05em di
+compensazione) e stesse correzioni su .mark__slice (inset 0 non
+eredita il padding: glifi copia allineati al base). La testa d'oro ora
+arriva fino al bordo del padding così copre anche la "e".
+
+Verifica CDP a pp .72/.97: "e" integra, aste sane, linea larga
+quanto il full ink; build ok.
+
+## Addendum 2026-10-13 i — la "e" tagliata (ink overflow)
+
+Causa radice (diagnosi del committente): i clip con `inset(...) 0 0 0`
+orizzontale tagliano l'ink overflow dei glifi Clash Display — la pancia
+della "e" esce dal box di layout di 2–3px, così la curva sparisce.
+Fix (soluzione 1 consigliata): inset laterali negativi.
+
+- `.mark__slicestack`: `inset((1−pp)·100% −0.15em −0.1em −0.15em)`
+- `.mark__slice`: lati orizzontali a `−0.15em` (verticale invariato).
+
+Verifica (CDP, computed clips espansi −18.2px a fs 121.6)
+screenshot mid-print: "e" di Double e "R" di LayeR intere, texture
+strati intatta.
