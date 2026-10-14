@@ -14,6 +14,12 @@ export const SITE = {
     number: '393333333333', // TODO: numero reale, formato internazionale senza +
     display: '+39 333 333 3333',
   },
+  // Form dei contatti: invii via Formspree (account gratuito collegato
+  // all'email sopra). A ID vuoto il form resta visibile ma l'invio
+  // fallisce: lo stato d'errore propone comunque la mail diretta.
+  formspree: {
+    formId: 'f/xjygadgb',
+  },
 } as const;
 
 export const PRINTERS = [
@@ -25,3 +31,10 @@ export const PRINTERS = [
 export function whatsappLink(message: string): string {
   return `https://wa.me/${SITE.whatsapp.number}?text=${encodeURIComponent(message)}`;
 }
+
+// Endpoint della form contatti: vuoto se l'ID non è ancora configurato.
+// Tollerante ai formati: "xjygadgb", "f/xjygadgb" e "/f/xjygadgb" sono uguali.
+export const formspreeEndpoint = (() => {
+  const raw = SITE.formspree.formId.replace(/^\/?(?:f\/)?/, '');
+  return raw ? `https://formspree.io/f/${raw}` : '';
+})();

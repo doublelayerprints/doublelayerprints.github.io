@@ -1,0 +1,304 @@
+---
+/**
+ * Piastra-form della pagina contatti. Invia via Formspree (endpoint in
+ * consts.ts): con JS fa una POST fetch e gestisce gli stati in pagina
+ * (stesso vocabolario G-code del sito), senza JS il submit nativo manda
+ * comunque il messaggio. Il campo `email` diventa automaticamente il
+ * Reply-to del messaggio; `_gotcha` è l'honeypot anti-bot di Formspree.
+ */
+import { ui, type UIKey, type Lang } from '../i18n/ui';
+import { SITE, formspreeEndpoint } from '../consts';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = (key: UIKey): string => ui[lang][key];
+
+const typeOptions: Array<{ key: UIKey }> = [
+  { key: 'form.type.piece' },
+  { key: 'form.type.idea' },
+  { key: 'form.type.collab' },
+  { key: 'form.type.other' },
+];
+---
+
+<form
+  class="form"
+  action={formspreeEndpoint}
+  method="POST"
+  data-form
+  data-sending={t('form.sending')}
+>
+  <input type="hidden" name="_subject" value={t('form.mailSubject')} />
+  <input
+    type="text"
+    name="_gotcha"
+    class="form__hp"
+    tabindex="-1"
+    autocomplete="off"
+    aria-hidden="true"
+  />
+
+  <div class="field">
+    <label class="form__label" for="f-type">{t('form.labelType')}</label>
+    <div class="field__select">
+      <select id="f-type" name="richiesta" required>
+        <option value="" disabled selected>{t('form.typePlaceholder')}</option>
+        {typeOptions.map((o) => <option value={t(o.key)}>{t(o.key)}</option>)}
+      </select>
+      <svg class="field__chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path
+          d="M4 6l4 4 4-4"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="form__label" for="f-email">{t('form.labelEmail')}</label>
+    <input id="f-email" type="email" name="email" required autocomplete="email" spellcheck="false" />
+  </div>
+
+  <div class="field">
+    <label class="form__label" for="f-message">{t('form.labelMessage')}</label>
+    <textarea id="f-message" name="messaggio" rows="6" required></textarea>
+  </div>
+
+  <button class="btn btn--solid form__send" type="submit" data-send>{t('form.send')}</button>
+
+  <p class="form__status form__status--ok" data-status-ok role="status" hidden tabindex="-1">
+    <span class="form__code form__code--ok">{t('form.successTitle')}</span>
+    <span class="form__text">{t('form.successText')}</span>
+  </p>
+  <p class="form__status form__status--ko" data-status-ko role="status" hidden tabindex="-1">
+    <span class="form__code">{t('form.errorTitle')}</span>
+    <span class="form__text">
+      {t('form.errorText')}{' '}
+      <a class="link" href={`mailto:${SITE.email}`}>{t('form.errorMailto')}</a>
+    </span>
+  </p>
+</form>
+
+<script is:inline>
+  (function () {
+    var init = function () {
+      var form = document.querySelector('[data-form]');
+      if (!form) return;
+      var send = form.querySelector('[data-send]');
+      var ok = form.querySelector('[data-status-ok]');
+      var ko = form.querySelector('[data-status-ko]');
+      var hp = form.querySelector('[name="_gotcha"]');
+      var sending = form.getAttribute('data-sending') || '…';
+      var original = send ? send.textContent : '';
+
+      var show = function (el) {
+        if (ok) ok.hidden = el !== ok;
+        if (ko) ko.hidden = el !== ko;
+        if (el) el.focus();
+      };
+      var hideAll = function () {
+        if (ok) ok.hidden = true;
+        if (ko) ko.hidden = true;
+      };
+      var lock = function () {
+        if (!send) return;
+        send.disabled = true;
+        send.textContent = sending;
+      };
+      var unlock = function () {
+        if (!send) return;
+        send.disabled = false;
+        send.textContent = original;
+      };
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        /* Honeypot compilato: è un bot. Successo finto, niente invio. */
+        if (hp && hp.value) {
+          show(ok);
+          return;
+        }
+        /* Endpoint non ancora configurato (ID Formspree vuoto). */
+        if (!form.getAttribute('action')) {
+          show(ko);
+          return;
+        }
+        hideAll();
+        lock();
+        fetch(form.getAttribute('action'), {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        })
+          .then(function (res) {
+            if (res.ok) {
+              form.reset();
+              show(ok);
+            } else {
+              show(ko);
+            }
+          })
+          .catch(function () {
+            show(ko);
+          })
+          .then(unlock, unlock);
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<style>
+  .form {
+    position: relative;
+    border: 1px solid var(--line-dark);
+    background: var(--paper);
+    padding: clamp(1.6rem, 3vw, 2.1rem);
+  }
+  /* Barra oro in cima: si stende quando qualcuno inizia a compilare */
+  .form::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s var(--ease-lay);
+  }
+  .form:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  .field + .field {
+    margin-top: 1.15rem;
+  }
+  .form__label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--purple-text);
+    margin-bottom: 0.55rem;
+  }
+
+  .form input,
+  .form select,
+  .form textarea {
+    display: block;
+    width: 100%;
+    padding: 0.78rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 0.98rem;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--paper-dim);
+    border: 1.5px solid var(--line-dark);
+    border-radius: 0;
+    transition: border-color 0.16s ease;
+  }
+  .form input:hover,
+  .form select:hover,
+  .form textarea:hover {
+    border-color: var(--muted);
+  }
+  .form input:focus,
+  .form select:focus,
+  .form textarea:focus {
+    border-color: var(--purple-text);
+  }
+  .form textarea {
+    resize: vertical;
+    min-height: 9.5rem;
+  }
+
+  .form select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.6rem;
+    cursor: pointer;
+  }
+  /* Il segnaposto "Scegli…" resta in grigio finché non si sceglie */
+  .form select:required:invalid {
+    color: var(--muted);
+  }
+  .form select option {
+    color: var(--ink);
+  }
+  .field__select {
+    position: relative;
+  }
+  .field__chevron {
+    position: absolute;
+    right: 0.9rem;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    transform: translateY(-50%);
+    color: var(--purple-text);
+    pointer-events: none;
+  }
+
+  .form__send {
+    margin-top: 1.35rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .form__send:disabled {
+    opacity: 0.75;
+    cursor: wait;
+  }
+
+  .form__status {
+    margin-top: 1.15rem;
+    border: 1px solid var(--line-dark);
+    background: var(--paper-dim);
+    padding: 1rem 1.1rem;
+  }
+  .form__code {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--purple-text);
+  }
+  /* Il chip oro su fondo scuro: lo stesso del contatore della scena hero.
+     Solo nel successo (l'errore resta in viola, senza festeggiamenti). */
+  .form__code--ok {
+    background: var(--footer-bg);
+    color: var(--gold);
+    padding: 0.3rem 0.55rem;
+  }
+  .form__text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  /* Honeypot: invisibile, fuori tab e fuori vista */
+  .form__hp {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    left: -100vw !important;
+    border: 0 !important;
+  }
+</style>
