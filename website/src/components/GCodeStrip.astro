@@ -79,13 +79,14 @@
     color: color-mix(in srgb, var(--purple) 45%, var(--muted));
   }
 
-  /* Righe: la riga in esecuzione si accende durante la scena */
+  /* Righe: la riga in esecuzione si accende durante la scena.
+     Accento "macchina": viola nel tema chiaro, oro nel tema scuro. */
   .gcode .gl {
     display: block;
   }
   .gcode .gl.exec {
-    background: color-mix(in srgb, var(--gold) 30%, transparent);
-    box-shadow: inset 2px 0 0 var(--gold);
+    background: color-mix(in srgb, var(--print-accent) 30%, transparent);
+    box-shadow: inset 2px 0 0 var(--print-accent);
   }
 
   @media (max-width: 1180px) {

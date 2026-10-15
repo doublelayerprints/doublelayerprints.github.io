@@ -6,6 +6,9 @@
  * così anche uno scroll veloce lascia vedere gli strati (CAP 0.7/s:
  * l'intera stampa attraversa in ~1.4s comunque si scrolli). Tutto
  * scroll-linked; il JS è solo il clock, le trasformazioni nel CSS.
+ * Solo in discesa (2026-10-14): in risalita niente animazione inversa,
+ * la scena si fissa al riposo pieno e «la pagina è semplicemente
+ * visibile»; ricominciando a scendere si rialinea senza scatti.
  * Attiva solo con JS e senza preferenza ridotta, e solo ≥760px: sotto,
  * l'hero resta statico (su telefono pin e stage allungato creavano
  * spazio morto e flick; 2026-10-13). Altrimenti statico.
@@ -77,6 +80,14 @@ const { id } = Astro.props;
     var raf = 0;
     var last = 0;
     var inView = true;
+
+    /* Direzione di scroll (richiesta 2026-10-14): la stampa avviene solo
+       in discesa. In risalita nessuna animazione all'indietro: la scena
+       si fissa al riposo pieno (p = 1, la pagina è semplicemente visibile)
+       e il latch dura fino alla ripresa in discesa, dove il progresso si
+       rialinea al punto corrente prima di inseguire in avanti. */
+    var prevY = window.scrollY;
+    var atRest = false;
 
     var apply = function (p) {
       /* Finestre scena: 10–24% cancella il materiale (foto + scritta —
@@ -154,13 +165,31 @@ const { id } = Astro.props;
 
     var seek = function () {
       if (!liveShown) return; /* mobile: niente scena, niente lavoro */
+      var y = window.scrollY;
+      var goingUp = y < prevY;
+      prevY = y;
       target = computeTarget();
+      if (goingUp) {
+        /* Risalita: la pagina è semplicemente visibile, senza scena. */
+        stopLoop();
+        cur = 1;
+        atRest = true;
+        apply(cur);
+        return;
+      }
       if (!inView) {
         stopLoop();
         cur = target;
         apply(cur);
         return;
       }
+      if (atRest && cur > target) {
+        /* Ripresa in discesa: riallinea il progresso al punto corrente
+           (nemmeno un salto di stato), poi insegna in avanti. */
+        cur = target;
+        apply(cur);
+      }
+      atRest = false;
       if (!raf) {
         last = 0;
         raf = requestAnimationFrame(tick);
@@ -171,7 +200,7 @@ const { id } = Astro.props;
       measure();
       target = computeTarget();
       stopLoop();
-      cur = target;
+      cur = atRest ? 1 : target;
       apply(cur);
     };
 

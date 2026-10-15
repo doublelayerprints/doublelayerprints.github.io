@@ -64,7 +64,10 @@ const jsonLd = {
     <meta name="theme-color" content="#eff0f2" data-theme-color />
 
     <!-- Tema: no-flash — decide prima del paint se serve Notturno.
-         Precedenza: scelta esplicita dell'utente > preferenza di sistema. -->
+         Precedenza: scelta esplicita dell'utente > preferenza di sistema.
+         L'attributo va scritto SEMPRE esplicito (anche "light"): il tema
+         chiaro segnato dall'assenza fa sì che il re-lettura in Nav.astro
+         cada sul tema di sistema e il tema "torni indietro" navigando. -->
     <script is:inline>
       (function () {
         var theme = 'light';
@@ -76,9 +79,7 @@ const jsonLd = {
             theme = 'dark';
           }
         } catch (e) {}
-        if (theme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
+        document.documentElement.setAttribute('data-theme', theme);
         var meta = document.querySelector('meta[data-theme-color]');
         if (meta) meta.setAttribute('content', theme === 'dark' ? '#191322' : '#eff0f2');
       })();

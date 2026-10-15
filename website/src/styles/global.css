@@ -91,6 +91,10 @@
   --on-dark-muted: #a39daf; /* testo secondario ("prints" footer) su fondi
                               sempre scuri — costante */
 
+  /* Accento "macchina" dell'animazione (teste di stampa, riga G-code in
+     esecuzione): viola su PLA White, oro su Notturno. */
+  --print-accent: #5b2e91;
+
   /* Type */
   --font-display: 'Clash Display', 'Satoshi', system-ui, sans-serif;
   --font-body: 'Satoshi', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -135,6 +139,7 @@
 
   --mark-echo: #8b68c9;    /* eco viola su Notturno — il viola di Double */
   --footer-bg: #140f1d;    /* più profondo del body, per distinguersi */
+  --print-accent: #ffce00; /* macchina in notturna: teste doro, come prima */
 }
 
 /* ------------------------------------------------------------
@@ -598,9 +603,7 @@ h4 {
   background: color-mix(in srgb, var(--footer-bg) 88%, transparent);
   opacity: 0;
   pointer-events: none;
-}
-
-/* Fasce della foto: 40 strati sottili che si depositano dal basso
+}/* Fasce della foto: 40 strati sottili che si depositano dal basso
    (FDM, più fin di prima su richiesta del 2026-10-13). La maschera
    clip-path per fascia e il deposito derivano da --pp / --i / --n,
    allineati al wordmark. Il var --n qui è la fonte: i default dei
@@ -633,7 +636,7 @@ h4 {
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--gold);
+  background: var(--print-accent);
   z-index: 6;
   opacity: 0;
   pointer-events: none;
