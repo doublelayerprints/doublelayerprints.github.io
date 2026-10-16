@@ -2,6 +2,13 @@
 title: 'Shy Guy'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'rosso, bianco, blu, giallo, marrone'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/shy-guy-1.jpg'
   - 'images/works/shy-guy-2.jpg'
@@ -11,6 +18,4 @@ featured: false
 order: 11
 ---
 
-Quanto può essere simpatico chi non mostra mai la faccia? Shy Guy risponde: parecchio. Cappuccio rosso, maschera bianca, scarpe blu — e il resto lo lascia alla fantasia di chi guarda.
-
-Frontale, di lato, di schiena: ce l'abbiamo mostrato da ogni angolazione, e dietro nessuna sorpresa. Sempre rosso, sempre silenzioso, come deve essere.
+Il personaggio più timido del regno: cappuccio rosso, maschera bianca, cintura marrone e scarpe blu. Semplice e subito riconoscibile, com'è sempre stato.

@@ -64,7 +64,7 @@ export const ui = {
       'Ogni pezzo nasce da un modello 3D: lo disegniamo o lo adattiamo, poi lo affettiamo con attenzione a orientamento, supporti e riempimento.',
     'process.2.title': 'Stampiamo',
     'process.2.text':
-      'Le nostre due stampanti lavorano in parallelo. Scegliamo il filamento giusto per ogni oggetto: PLA silk per brillare, PETG per resistere.',
+      'Le nostre due stampanti lavorano in parallelo. Per ogni oggetto scegliamo il filamento giusto tra PLA e PLA+.',
     'process.3.title': 'Rifiniamo',
     'process.3.text':
       'Rimuoviamo supporti, controlliamo le superfici e sistemiamo i dettagli a mano. Se un pezzo non ci convince, lo ristampiamo.',
@@ -101,12 +101,14 @@ export const ui = {
     'work.back': 'Tutti i lavori',
     'work.specs': 'Specifiche di stampa',
     'spec.material': 'Materiale',
+    'spec.colors': 'Colori',
+    'spec.height': 'Altezza',
     'spec.dimensions': 'Dimensioni',
     'spec.layer': 'Altezza layer',
     'spec.weight': 'Peso',
     'spec.time': 'Tempo di stampa',
-    'work.cta': 'Scrivici su WhatsApp',
-    'work.whatsappPrefill': 'Ciao! Ho visto "{title}" sul vostro sito e vorrei qualche informazione in più.',
+    'work.cta': 'Scrivici via email',
+    'work.mailSubject': 'Info su "{title}"',
     'work.photoPlaceholder': 'Foto in arrivo — il pezzo esiste, la foto professionale no (ancora).',
 
     // Chi siamo
@@ -124,9 +126,6 @@ export const ui = {
     'contact.ig.action': 'Apri Instagram',
     'contact.email.desc': 'Per richieste più lunghe, file .stl o collaborazioni. Rispondiamo entro un giorno.',
     'contact.email.action': 'Scrivici una email',
-    'contact.wa.desc': 'Il modo più rapido: chat diretta per domande, colori e disponibilità.',
-    'contact.wa.action': 'Apri la chat',
-    'contact.whatsappPrefill': 'Ciao! Vi scrivo dal vostro sito Double LayeR Prints.',
 
     // Contatti — form
     'rail.write': 'Scrivici',
@@ -134,7 +133,7 @@ export const ui = {
     'form.title': 'Scrivici',
     'form.intro':
       'Compila il modulo: il messaggio ci arriva direttamente per email e rispondiamo entro un giorno.',
-    'form.directNote': 'Preferisci un canale diretto? Qui sopra trovi Instagram, email e WhatsApp.',
+    'form.directNote': 'Preferisci un canale diretto? Qui sopra trovi Instagram e l\u2019email.',
     'form.labelType': '; RICHIESTA',
     'form.typePlaceholder': 'Scegli…',
     'form.type.piece': 'Un pezzo visto sul sito',
@@ -215,7 +214,7 @@ export const ui = {
       'Every piece starts as a 3D model: we draw or adapt it, then slice it with care for orientation, supports and infill.',
     'process.2.title': 'We print',
     'process.2.text':
-      'Our two printers work in parallel. We pick the right filament for each object: silk PLA to shine, PETG to last.',
+      'Our two printers work in parallel. For each object we pick the right filament between PLA and PLA+.',
     'process.3.title': 'We finish',
     'process.3.text':
       'We remove supports, check surfaces and fix details by hand. If a piece does not convince us, we print it again.',
@@ -249,12 +248,14 @@ export const ui = {
     'work.back': 'All works',
     'work.specs': 'Print specs',
     'spec.material': 'Material',
+    'spec.colors': 'Colors',
+    'spec.height': 'Height',
     'spec.dimensions': 'Dimensions',
     'spec.layer': 'Layer height',
     'spec.weight': 'Weight',
     'spec.time': 'Print time',
-    'work.cta': 'Message us on WhatsApp',
-    'work.whatsappPrefill': 'Hi! I saw "{title}" on your site and I\u2019d like to know more about it.',
+    'work.cta': 'Email us',
+    'work.mailSubject': 'About "{title}"',
     'work.photoPlaceholder': 'Photos coming soon — the piece exists, the professional photo does not (yet).',
 
     'about.eyebrow': '; TWO PRINTERS · TWO PEOPLE',
@@ -270,9 +271,6 @@ export const ui = {
     'contact.ig.action': 'Open Instagram',
     'contact.email.desc': 'For longer requests, .stl files or collaborations. We reply within a day.',
     'contact.email.action': 'Send us an email',
-    'contact.wa.desc': 'The fastest way: direct chat for questions, colors and availability.',
-    'contact.wa.action': 'Open the chat',
-    'contact.whatsappPrefill': 'Hi! I\u2019m writing from your Double LayeR Prints site.',
 
     // Contacts — form
     'rail.write': 'Write to us',
@@ -280,7 +278,7 @@ export const ui = {
     'form.title': 'Write to us',
     'form.intro':
       'Fill in the form: the message lands straight in our inbox and we reply within a day.',
-    'form.directNote': 'Prefer a direct channel? Instagram, email and WhatsApp are right above.',
+    'form.directNote': 'Prefer a direct channel? Instagram and email are right above.',
     'form.labelType': '; REQUEST',
     'form.typePlaceholder': 'Choose…',
     'form.type.piece': 'A piece I saw on the site',

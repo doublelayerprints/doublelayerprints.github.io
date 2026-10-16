@@ -2,6 +2,13 @@
 title: 'Principessa Daisy'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'giallo, arancione, rosa, verde, marrone, bianco'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/daisy-1.jpg'
   - 'images/works/daisy-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 12
 ---
 
-Entra in scena salutando a gran voce: questa principessa non ha niente di timido. Abito giallo e arancio, corona in testa, e un vestito che da solo porta una buona parte della stampa, fra gioco di colori e dettagli piccoli della gonna.
-
-Poi sfilano in coppia con Luigi: giallo e verde messi uno accanto all'altro funzionano meglio di quanto pensassimo. E a lei non sembra dispiacere avere un idraulico verde tutto per sé.
+La principessa del regno con l'abito giallo e arancio, la corona rosa e i guanti bianchi. Tanti colori concentrati in una figura sola, tutti al posto giusto.

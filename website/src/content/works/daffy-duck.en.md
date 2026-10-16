@@ -2,6 +2,13 @@
 title: 'Daffy Duck'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'black, orange, white'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/daffy-duck-1.jpg'
   - 'images/works/daffy-duck-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 19
 ---
 
-The most high-strung duck on screen: black feathers, orange bill and feet, and a permanent air of an argument about to start. The solid black makes the orange bill pop even harder, and that bill is the figure's signature.
-
-He never quite stops looking ready to object to something — which suits him perfectly, since printing him was a lot easier than getting him to stay quiet.
+The black duck with the orange bill and feet and the white neck collar. Solid feathers, sharp contrasts: the look alone makes him unmistakable.

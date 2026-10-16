@@ -1,11 +1,13 @@
 ---
 title: 'Organizer Modulare'
 category: tools
-materials: 'PLA opaco'
-dimensions: '60 × 60 × 80 mm (modulo)'
-layerHeight: '0.2 mm'
-weight: '45 g (a modulo)'
-printTime: '2 h 10 m (a modulo)'
+materials: 'PLA / PLA+'
+colors: ''
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/modular-organizer-1.svg'
   - 'images/works/modular-organizer-2.svg'
@@ -14,6 +16,4 @@ featured: false
 order: 5
 ---
 
-Esagoni che si incastrano con piccoli magneti: cominci con un modulo per le penne e finisci con un alveare sulla scrivania.
-
-Ogni modulo si stampa da solo, quindi il sistema cresce quando vuoi — un pezzo alla volta, come i layer.
+Moduli esagonali che si incastrano fra loro: si comincia da un pezzo e l'organizer cresce come vuoi, un modulo alla volta.

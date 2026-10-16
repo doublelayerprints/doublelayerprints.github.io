@@ -2,6 +2,13 @@
 title: 'Bullet Bill'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'black, white'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/bullet-bill-2.jpg'
   - 'images/works/bullet-bill-1.jpg'
@@ -18,6 +25,4 @@ featured: false
 order: 17
 ---
 
-The angriest-looking projectile in the kingdom: matte black, stubby arms, and a base with the white skull emblem. Solid black against that white accent makes a great contrast, and the figure reads clearly even from across the room.
-
-The head detaches from the body, so of course we had to try: no disappointment there — clean joints and no glue in sight. When Toad strolls through, the runner-and-flyer couple closes the series in style.
+The angriest projectile in the kingdom: a black figure with angry eyes and a white fist, ready to shoot out of the skull-emblem cannon. Full black against white details: sharp contrast, instantly readable.

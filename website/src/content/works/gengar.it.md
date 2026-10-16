@@ -2,6 +2,13 @@
 title: 'Gengar'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'viola, rosso, bianco'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/gengar-1.jpg'
   - 'images/works/gengar-2.jpg'
@@ -11,6 +18,4 @@ featured: true
 order: 15
 ---
 
-Il sorriso arriva prima di tutto il resto: enorme, con due zanne bianche che da sole valgono tutta la stampa. Un corpo viola rotondo come il suo fa scorrere la stampa via liscia, e la faccia furba è riuscita meglio di quanto sperassimo.
-
-Quando una figura funziona così, non serve aggiungere altro. Dicono che ami nascondersi nelle ombre per ridere — il nostro sta in mensola in piena luce, il sorriso a tutta pagina per chiunque passi.
+Il fantasma viola col sorriso più largo del regno: dentini bianchi, occhi rossi e lingua in vista. Corpo tondo e arrotondato, con orecchie a punta e schiena spinosa.

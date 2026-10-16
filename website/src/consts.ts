@@ -10,10 +10,6 @@ export const SITE = {
     url: 'https://instagram.com/doublelayerprints',
   },
   email: 'doublelayerprints@gmail.com', // TODO: email reale
-  whatsapp: {
-    number: '393333333333', // TODO: numero reale, formato internazionale senza +
-    display: '+39 333 333 3333',
-  },
   // Form dei contatti: invii via Formspree (account gratuito collegato
   // all'email sopra). A ID vuoto il form resta visibile ma l'invio
   // fallisce: lo stato d'errore propone comunque la mail diretta.
@@ -27,9 +23,10 @@ export const PRINTERS = [
   { model: 'Anycubic Kobra X', type: { it: 'FDM ad alta velocità', en: 'High-speed FDM' } },
 ] as const;
 
-// Prefill WhatsApp: testo del messaggio che parte quando si clicca
-export function whatsappLink(message: string): string {
-  return `https://wa.me/${SITE.whatsapp.number}?text=${encodeURIComponent(message)}`;
+// Email diretta: link mailto, con oggetto precompilato se passato.
+export function emailLink(subject?: string): string {
+  const base = `mailto:${SITE.email}`;
+  return subject ? `${base}?subject=${encodeURIComponent(subject)}` : base;
 }
 
 // Endpoint della form contatti: vuoto se l'ID non è ancora configurato.

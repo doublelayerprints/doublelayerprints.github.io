@@ -1,11 +1,13 @@
 ---
 title: 'Geometric Planter'
 category: home
-materials: 'PETG'
-dimensions: '120 × 120 × 100 mm'
-layerHeight: '0.2 mm'
-weight: '150 g'
-printTime: '6 h 45 m'
+materials: 'PLA / PLA+'
+colors: ''
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/geometric-planter-1.svg'
   - 'images/works/geometric-planter-2.svg'
@@ -14,6 +16,4 @@ featured: false
 order: 2
 ---
 
-A succulent planter with faceting that changes with the light of the day.
-
-PETG makes it water-resistant, and the bottom hides a drainage tray printed in the same piece: no puddles on your desk.
+A succulent planter with a faceted surface: the geometry changes face with the light.

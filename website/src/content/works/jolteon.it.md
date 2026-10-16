@@ -2,6 +2,13 @@
 title: 'Jolteon'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'giallo, bianco, nero'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/jolteon-1.jpg'
   - 'images/works/jolteon-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 13
 ---
 
-Il Pokémon che sembra appena uscito da una tempesta: giallo acceso, pelo a punte e colletto bianco da folgore. Le punte erano la parte che ci inquietava — devono venire intere e ben distinte — e invece sono arrivate tutte all'appuntamento, appuntite come dovevano.
-
-Quando gli si affianca Umbreon il contrasto fa tutto: giallo e nero, giorno e notte. Due fratelli opposti che si esaltano a vicenda, proprio come dentro il gioco.
+Il Pokémon elettrico in versione seduta: pelo giallo a punte, colletto bianco e orecchie grandi con l'interno nero. Le punte restano tutte ben distinte, senza fusioni.

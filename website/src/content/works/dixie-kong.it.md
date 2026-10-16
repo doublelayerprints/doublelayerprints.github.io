@@ -2,6 +2,13 @@
 title: 'Dixie Kong'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'marrone, beige, magenta, giallo, verde'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/dixie-kong-1.jpg'
   - 'images/works/dixie-kong-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 9
 ---
 
-La scimmietta con la coda bionda a cavatappi sempre in alto: berretto e top magenta e l'aria di chi balla pure da ferma. La coda era la parte che ci spaventava di più — deve venire tonda, continua e appuntita — ed è uscita liscia da radice a punta.
-
-Da sola regge la scena benissimo, ma quando entra in scena Diddy Kong si passa al duetto. Lui nel rosso, lei nel magenta: il contrasto fa metà del lavoro, e sulla mensola si accendono a vicenda.
+La scimmietta dalla coda bionda a cavatappi: berretto e top magenta, occhi verdi e pelo marrone col muso beige. Un mix di colori acceso che la fa spiccare ovunque.

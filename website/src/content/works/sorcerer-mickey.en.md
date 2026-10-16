@@ -2,6 +2,13 @@
 title: 'Sorcerer Mickey'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'blue, light blue, red, white, black, brown'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/sorcerer-mickey-1.jpg'
   - 'images/works/sorcerer-mickey-2.jpg'
@@ -14,6 +21,4 @@ featured: true
 order: 18
 ---
 
-Animation's most famous apprentice: blue hat with stars and moons, red robe, wand at the ready. The stars on that hat are minuscule, and multicolor makes it a lottery every time — this time we won it whole.
-
-He's the most theatrical character in the collection: the red robe grabs you first, then you discover the stars, the moon and the wand. And the ears still poke through the hat, because a Mickey without ears is simply not a Mickey.
+The sorcerer's apprentice: blue star-and-moon hat, red robe, blue wand in hand and white gloves. The stars on the hat are tiny and each landed exactly in place.

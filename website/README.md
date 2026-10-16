@@ -21,7 +21,9 @@ npm run placeholders  # rigenera le immagini placeholder dei pezzi
    - `mio-pezzo.it.md` (versione italiana)
    - `mio-pezzo.en.md` (versione inglese)
    con lo stesso nome base. Frontmatter di riferimento (copia da un file esistente):
-   `title, category (figures|home|tools|art), materials, dimensions, layerHeight, weight, printTime, photos[], alt, featured, order`.
+   `title, category (figures|home|tools|art), origin, materials, colors, height, photos[], alt, featured, order`.
+   `height` (e opzionali `dimensions`, `layerHeight`, `weight`, `printTime`) restano
+   vuoti `''` finché non c'è il valore vero: nella tabella specifiche mostrano un trattino.
 3. `featured: true` lo fa apparire tra i "Lavori selezionati" in home. `order` decide l'ordine in galleria.
 4. Riferimenti al pezzo: `lavori/mio-pezzo` in italiano, `en/works/mio-pezzo` in inglese.
 
@@ -29,13 +31,13 @@ npm run placeholders  # rigenera le immagini placeholder dei pezzi
 
 | Cosa | File |
 |---|---|
-| Instagram, email, numero WhatsApp | `src/consts.ts` |
+| Instagram, email | `src/consts.ts` |
 | Testi dell'interfaccia (IT/EN) | `src/i18n/ui.ts` |
 | Storia "Chi siamo" | `src/components/pages/AboutPage.astro` |
 | Colori, font, spaziature | `src/styles/global.css` (sezione Token) |
 | Stampanti | `src/consts.ts` (`PRINTERS`) |
 
-I contatti attuali (handle Instagram, email, numero WhatsApp) sono **placeholder**: sostituirli in `src/consts.ts`.
+I contatti attuali (handle Instagram, email) sono **placeholder**: sostituirli in `src/consts.ts`.
 
 ## Foto vere
 

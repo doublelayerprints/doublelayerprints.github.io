@@ -2,6 +2,13 @@
 title: 'Umbreon'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'nero, giallo, rosso'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/umbreon-1.jpg'
   - 'images/works/umbreon-2.jpg'
@@ -14,6 +21,4 @@ featured: false
 order: 14
 ---
 
-La versione notturna della famiglia: nero profondo, anelli gialli e occhi rossi che mettono soggezione. Con un nero così pieno ogni dettaglio si vede, e gli anelli — la firma del personaggio — sono arrivati regolari e fermi al loro posto.
-
-In coppia con Jolteon, poi, il contrasto prende vita: nero e giallo, notte e giorno. Affiancati sembrano due letture diverse della stessa idea, ed è esattamente l'effetto che cercavamo.
+Il Pokémon della notte: nero profondo, anelli gialli su orecchie, fronte e zampe, occhi rossi. Il nero pieno fa risaltare gli anelli ancora di più.

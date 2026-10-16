@@ -5,7 +5,7 @@ import PageRail from '../PageRail.astro';
 import SectionBar from '../SectionBar.astro';
 import { ui, type UIKey, type Lang } from '../../i18n/ui';
 import { pathFor, asset } from '../../i18n/utils';
-import { PRINTERS, SITE, whatsappLink } from '../../consts';
+import { PRINTERS, SITE, emailLink } from '../../consts';
 
 interface Props {
   lang: Lang;
@@ -102,8 +102,8 @@ const sections: Array<{ id: string; label: UIKey }> = [
         <p class="section-intro">{t('contact.intro')}</p>
       </div>
       <div class="band__cta">
-        <a class="btn btn--solid" href={whatsappLink(t('contact.whatsappPrefill'))} target="_blank" rel="noopener">
-          {t('contact.wa.action')}
+        <a class="btn btn--solid" href={emailLink()}>
+          {t('contact.email.action')}
         </a>
         <a class="btn" href={pathFor('lavori', lang)}>{t('about.cta')}</a>
       </div>

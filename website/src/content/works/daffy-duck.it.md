@@ -2,6 +2,13 @@
 title: 'Daffy Duck'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'nero, arancione, bianco'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/daffy-duck-1.jpg'
   - 'images/works/daffy-duck-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 19
 ---
 
-L'anatra più nervosa dello schermo: piumaggio nero, becco e piedi arancioni e l'aria permanente da lite in arrivo. Il nero pieno rende ancora più deciso il contrasto con il becco arancio, che è la firma della figura.
-
-Non smette mai di sembrare sul punto di obiettare qualcosa — visto che stamparlo è stato molto più facile che farlo stare zitto, ci sta benissimo così.
+L'anatra nera col becco e i piedi arancioni e il colletto bianco al collo. Piumaggio pieno e contrasti netti: il look da solo la rende riconoscibile.

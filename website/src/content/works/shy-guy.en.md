@@ -2,6 +2,13 @@
 title: 'Shy Guy'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'red, white, blue, yellow, brown'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/shy-guy-1.jpg'
   - 'images/works/shy-guy-2.jpg'
@@ -11,6 +18,4 @@ featured: false
 order: 11
 ---
 
-How likable can someone be when they never show their face? Shy Guy's answer: plenty. Red hood, white mask, blue shoes — and the rest is left to the viewer's imagination.
-
-Front, side, back: we've shown him from every angle, and there are no surprises behind. Still red, still silent, just as it should be.
+The shyest character in the kingdom: red hood, white mask, brown belt and blue shoes. Simple and instantly recognizable, as it has always been.

@@ -2,6 +2,13 @@
 title: 'Titti'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'giallo, arancione, nero, azzurro'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/tweety-1.jpg'
   - 'images/works/tweety-2.jpg'
@@ -14,6 +21,4 @@ featured: true
 order: 20
 ---
 
-Il canarino più protetto della televisione: giallo acceso, ciuffo nero, occhi azzurri e la faccia di chi non ha mai dubitato su chi avrebbe vinto la partita. Seduto com'è, sembra l'unico personaggio dello scaffale che si sia preso davvero una pausa.
-
-Il giallo acceso è un colore che non perdona niente, e il risultato ci rende ben orgogliosi: forma tonda e liscia, ciuffo nero piantato in cima alla testa e sguardo dolce verso chi guarda. E nessun gatto l'ha toccato finora.
+Il canarino giallo seduto: ciuffo nero, occhi azzurri, becco e piedi arancioni. Forme tonde e lisce, su un giallo acceso che non perdona niente.

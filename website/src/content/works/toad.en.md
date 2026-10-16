@@ -2,6 +2,13 @@
 title: 'Toad'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'white, red, blue, yellow, brown, beige'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/toad-1.jpg'
   - 'images/works/toad-2.jpg'
@@ -14,6 +21,4 @@ featured: false
 order: 16
 ---
 
-White mushroom cap with red spots, blue vest and bare beige hands: the most recognizable uniform in the Mushroom Kingdom. The spots on the cap are the hardest part to get even, which is why we're so happy with how they came out: round, all alike.
-
-Then the backup shows up too: paired with Bullet Bill, the two stand calmly side by side, one that runs and one that flies, and on the shelf the scene tells itself.
+The most famous mushroom in the kingdom: white cap with red spots, blue vest with yellow trim and brown shoes. Round, even spots: the detail that makes the whole figure.

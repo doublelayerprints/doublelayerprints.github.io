@@ -2,6 +2,13 @@
 title: 'Luigi'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'green, blue, white, yellow, brown, black'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/luigi-1.jpg'
   - 'images/works/luigi-2.jpg'
@@ -16,6 +23,4 @@ featured: false
 order: 8
 ---
 
-The green twin: a touch taller, with the longer mustache and the attitude of someone who looks before he leaps. The L on his cap is minuscule and full of color changes, yet it came out as sharp as the rest of the overalls.
-
-The first four photos show him alone, then Mario drops in for the brothers' shot and Princess Daisy joins him last. If one of the two plumbers has a fan club in this studio, let's admit it now: it's him.
+The green twin: L cap, blue overalls, long mustache and white gloves raised in victory. Lots of colors, all kept nicely apart.

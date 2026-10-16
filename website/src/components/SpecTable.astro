@@ -8,29 +8,29 @@ interface Props {
 }
 const { entry, lang } = Astro.props;
 const t = (key: UIKey): string => ui[lang][key];
-const rows: Array<[UIKey, string]> = (
-  [
-    ['spec.material', entry.data.materials],
-    ['spec.dimensions', entry.data.dimensions],
-    ['spec.layer', entry.data.layerHeight],
-    ['spec.weight', entry.data.weight],
-    ['spec.time', entry.data.printTime],
-  ] as Array<[UIKey, string | undefined]>
-).filter((row): row is [UIKey, string] => Boolean(row[1]));
+// Tutte le righe sono sempre visibili: i valori non ancora riempiti
+// mostrano un trattino, così è chiaro che vanno completati.
+const rows: Array<[UIKey, string | undefined]> = [
+  ['spec.material', entry.data.materials],
+  ['spec.colors', entry.data.colors],
+  ['spec.height', entry.data.height],
+  ['spec.dimensions', entry.data.dimensions],
+  ['spec.layer', entry.data.layerHeight],
+  ['spec.weight', entry.data.weight],
+  ['spec.time', entry.data.printTime],
+];
 ---
 
-{rows.length > 0 && (
-  <dl class="specs">
-    {
-      rows.map(([key, value]) => (
-        <div class="specs__row">
-          <dt>{t(key)}</dt>
-          <dd>{value}</dd>
-        </div>
-      ))
-    }
-  </dl>
-)}
+<dl class="specs">
+  {
+    rows.map(([key, value]) => (
+      <div class="specs__row">
+        <dt>{t(key)}</dt>
+        <dd class={value ? undefined : 'specs__row--empty'}>{value || '—'}</dd>
+      </div>
+    ))
+  }
+</dl>
 
 <style>
   .specs {
@@ -59,5 +59,11 @@ const rows: Array<[UIKey, string]> = (
     font-weight: 700;
     color: var(--ink);
     text-align: right;
+  }
+
+  /* Valore non ancora inserito: trattino in grigio, niente finto dato */
+  .specs__row dd.specs__row--empty {
+    font-weight: 400;
+    color: var(--muted);
   }
 </style>

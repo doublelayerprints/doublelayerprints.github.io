@@ -2,6 +2,13 @@
 title: 'Bullet Bill'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'nero, bianco'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/bullet-bill-2.jpg'
   - 'images/works/bullet-bill-1.jpg'
@@ -18,6 +25,4 @@ featured: false
 order: 17
 ---
 
-Il proiettile con l'aria più arrabbiata del regno: nero opaco, braccia corte e base con l'emblema del teschio bianco. Il nero pieno e l'accento bianco fanno un bel contrasto, e la figura si legge nettamente anche da lontano.
-
-La testa si sgancia dal tronco, e ovviamente abbiamo dovuto provarci: lo smontaggio non delude, con giunzioni pulite e niente colla in vista. Quando sfreccia Toad, poi, la coppia corridore-volante chiude la serie in bellezza.
+Il proiettile più arrabbiato del regno: figura nera con occhi cattivi e pugno bianco, in attesa di schizzare fuori dal cannone con l'emblema del teschio. Nero pieno e dettagli bianchi: contrasto netto e figura leggibilissima.

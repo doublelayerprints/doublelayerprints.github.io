@@ -2,6 +2,13 @@
 title: 'Toad'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'bianco, rosso, blu, giallo, marrone, beige'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/toad-1.jpg'
   - 'images/works/toad-2.jpg'
@@ -14,6 +21,4 @@ featured: false
 order: 16
 ---
 
-Cappello a fungo bianco con pois rossi, gilet blu e mani beige: l'uniforme più riconoscibile del Regno dei Funghi. I pois del cappello sono la parte più impegnativa da far venire regolari, ed è per questo che siamo contenti di come sono usciti: rotondi, tutti uguali.
-
-Poi arriva pure la scorta: in coppia con Bullet Bill i due si affiancano tranquilli, uno che corre e uno che vola, e sulla mensola la scena si racconta da sola.
+Il fungo più famoso del regno: cappello bianco con pois rossi, gilet blu con orlo giallo e scarpe marroni. Pois rotondi e regolari: il dettaglio che fa tutta la figura.

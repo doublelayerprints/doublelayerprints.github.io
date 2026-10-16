@@ -1,11 +1,13 @@
 ---
 title: 'Ancient Dragon'
 category: art
-materials: 'Purple silk PLA'
-dimensions: '200 × 150 × 150 mm'
-layerHeight: '0.12 mm'
-weight: '350 g'
-printTime: '14 h 20 m'
+materials: 'PLA / PLA+'
+colors: ''
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/dragon-bust-1.svg'
   - 'images/works/dragon-bust-2.svg'
@@ -15,6 +17,4 @@ featured: false
 order: 1
 ---
 
-The piece that made us fall in love with silk filament: light slides over the scales and the dragon looks almost like metal, without a drop of paint.
-
-Printed at 0.12 mm so not even a fang gets lost. It is the piece that always ends up in the spotlight when someone walks into the workshop.
+A dragon bust all about the details: scales, fangs and horns front and center. A sculpture that holds your gaze from every angle.

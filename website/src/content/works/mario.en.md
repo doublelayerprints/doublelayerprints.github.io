@@ -2,6 +2,13 @@
 title: 'Mario'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'red, blue, white, yellow, brown, black'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/mario-1.jpg'
   - 'images/works/mario-2.jpg'
@@ -14,6 +21,4 @@ featured: true
 order: 7
 ---
 
-It's him, the plumber in overalls: red cap, groomed mustache, white gloves and the yellow buttons exactly where they belong. A lot of color changes packed into a few centimeters, yet everything came out crisp: no paint, just patience.
-
-We shot him solo in a fighting pose, then from behind — the back of a multicolor print has to pass inspection too — and finally together with Luigi. Side by side you can tell right away that he's the stocky one and his brother is the lanky one: that's character design, not a scaling mistake.
+The plumber in a fighting stance: red cap with the M, blue overalls, white gloves and a groomed mustache. Lots of color changes packed into a few centimeters, all crisp.

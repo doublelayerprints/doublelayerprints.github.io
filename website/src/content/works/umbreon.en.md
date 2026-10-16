@@ -2,6 +2,13 @@
 title: 'Umbreon'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'black, yellow, red'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/umbreon-1.jpg'
   - 'images/works/umbreon-2.jpg'
@@ -14,6 +21,4 @@ featured: false
 order: 14
 ---
 
-The night version of the family: deep black, yellow rings and red eyes that make people lower their voices. On such a solid black every detail shows, and the rings — the character's signature — came out regular, each one set firmly in place.
-
-Paired with Jolteon, though, the contrast comes alive: black and yellow, night and day. Side by side they read like two takes on the same idea, which is exactly the effect we were after.
+The night Pokémon: deep black with yellow rings on ears, forehead and legs, and red eyes. The solid black makes the rings stand out even more.

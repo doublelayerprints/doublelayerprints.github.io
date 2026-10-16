@@ -2,6 +2,13 @@
 title: 'Jolteon'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'yellow, white, black'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/jolteon-1.jpg'
   - 'images/works/jolteon-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 13
 ---
 
-The most charged-up Pokémon there is: bright yellow, spiky fur and a white collar like a lightning bolt. Those tips were the part that worried us — they have to come out whole and clearly separated — instead every single one showed up on cue, pointed as designed.
-
-When Umbreon steps beside it, the contrast does all the work: yellow and black, day and night. Two opposite siblings that bring out the best in each other, exactly like in the games.
+The electric Pokémon sitting down: spiky yellow fur, white collar and big ears with black insides. Every fur tip stays clean and separate, no merging.

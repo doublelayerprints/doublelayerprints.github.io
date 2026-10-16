@@ -2,6 +2,13 @@
 title: 'Gengar'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'purple, red, white'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/gengar-1.jpg'
   - 'images/works/gengar-2.jpg'
@@ -11,6 +18,4 @@ featured: true
 order: 15
 ---
 
-The grin arrives before anything else: huge, with two white fangs worth the whole print on their own. A purple body as round as his lets the print glide through, and the sly face came out better than we hoped.
-
-When a figure works this well, there's nothing left to add. They say he loves hiding in shadows to chuckle — ours sits in full light on the shelf, grin at full width for whoever walks by.
+The purple ghost with the widest grin in the kingdom: white teeth, red eyes and tongue out in the open. A round, chunky body with pointed ears and a spiky back.

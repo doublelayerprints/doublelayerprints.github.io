@@ -2,6 +2,13 @@
 title: 'Mario'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'rosso, blu, bianco, giallo, marrone, nero'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/mario-1.jpg'
   - 'images/works/mario-2.jpg'
@@ -14,6 +21,4 @@ featured: true
 order: 7
 ---
 
-È lui, l'idraulico in salopette: cappello rosso, baffi curati, guanti bianchi e i botoncini gialli della tuta al loro posto. Ci sono tantissimi passaggi di colore concentrati in pochi centimetri, eppure tutto è venuto netto: niente vernice, solo pazienza.
-
-L'abbiamo fotografato da solo in posa da combattimento, poi di spalle — anche il retro di una stampa multicolore deve reggere l'esame — e infine insieme a Luigi. Affiancati si vede subito che lui è quello tarchiato e il fratello quello lungo e smilzo: è character design, non un errore di scala.
+L'idraulico in posa da combattimento: cappello rosso con la M, salopette blu, guanti bianchi e baffi curati. Tanti passaggi di colore in pochi centimetri, tutti netti.

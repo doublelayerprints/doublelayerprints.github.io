@@ -1,7 +1,7 @@
 ---
 import { pathFor } from '../i18n/utils';
 import { ui, type UIKey, type Lang } from '../i18n/ui';
-import { SITE, whatsappLink } from '../consts';
+import { SITE } from '../consts';
 import Wordmark from './Wordmark.astro';
 import LayerLines from './LayerLines.astro';
 
@@ -15,7 +15,6 @@ const menuLinks = [
   { route: 'chi-siamo', label: t('nav.about') },
   { route: 'contatti', label: t('nav.contact') },
 ];
-const prefill = t('contact.whatsappPrefill');
 ---
 
 <footer class="footer">
@@ -36,9 +35,6 @@ const prefill = t('contact.whatsappPrefill');
         @{SITE.instagram.handle}
       </a>
       <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-      <a href={whatsappLink(prefill)} target="_blank" rel="noopener">
-        {SITE.whatsapp.display}
-      </a>
     </div>
   </div>
 

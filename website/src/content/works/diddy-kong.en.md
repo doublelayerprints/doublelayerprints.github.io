@@ -2,6 +2,13 @@
 title: 'Diddy Kong'
 category: figures
 origin: remix
+materials: 'PLA / PLA+'
+colors: 'brown, beige, red, yellow'
+height: ''
+dimensions: ''
+layerHeight: ''
+weight: ''
+printTime: ''
 photos:
   - 'images/works/diddy-kong-1.jpg'
   - 'images/works/diddy-kong-2.jpg'
@@ -13,6 +20,4 @@ featured: false
 order: 10
 ---
 
-The smallest and most hyper member of the Kong family: red cap and a red shirt stitched with yellow stars. The stars are tiny, and in a multicolor print every detail counts: they all landed in place, with no fuzz.
-
-Then Dixie Kong steps in beside him: red against magenta, going from solo act to duet. It's the most colorful pairing in the collection — and now the shelf has its complete game.
+The most hyper little ape of the Kong family: brown body, beige face, red cap and a shirt with yellow stars. The stars are tiny but clearly defined.

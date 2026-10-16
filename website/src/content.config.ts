@@ -13,6 +13,8 @@ const works = defineCollection({
     category: z.enum(['figures', 'home', 'tools', 'art']),
     origin: z.enum(['original', 'remix']).default('original'),
     materials: z.string().optional(),
+    colors: z.string().optional(),
+    height: z.string().optional(),
     dimensions: z.string().optional(),
     layerHeight: z.string().optional(),
     weight: z.string().optional(),
