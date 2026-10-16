@@ -6,8 +6,11 @@ import type { CollectionEntry } from 'astro:content';
 interface Props {
   entry: CollectionEntry<'works'>;
   lang: Lang;
+  /** 'plate' = riquadro 3:4 fisso (pagina Lavori). 'tile' = cella del mosaico in home. */
+  variant?: 'plate' | 'tile';
 }
-const { entry, lang } = Astro.props;
+const { entry, lang, variant = 'plate' } = Astro.props;
+const isTile = variant === 'tile';
 const t = (key: UIKey): string => ui[lang][key];
 const slug = entry.id.replace(/\.(it|en)$/, '');
 const catKey = `cat.${entry.data.category}` as UIKey;
@@ -20,7 +23,7 @@ const srcLight = asset(src);
 const darkSrc = asset(srcDark);
 ---
 
-<article class="plate" data-category={entry.data.category}>
+<article class={isTile ? 'plate plate--tile' : 'plate'} data-category={entry.data.category}>
   <a class="plate__link" href={pathFor(`lavori/${slug}`, lang)}>
     <i class="plate__gold" aria-hidden="true"></i>
     <div class={isSvg ? 'plate__media' : 'plate__media plate__media--tall'}>
@@ -53,12 +56,13 @@ const darkSrc = asset(srcDark);
         <p class="plate__cat">{t(catKey)}&nbsp;·&nbsp;{t(originKey)}</p>
       </div>
       {
-        (entry.data.materials || entry.data.layerHeight) && (
-          <p class="plate__spec">
-            {entry.data.materials && <span>{entry.data.materials}</span>}
-            {entry.data.layerHeight && <span>{entry.data.layerHeight}</span>}
-          </p>
-        )
+        !isTile &&
+          (entry.data.materials || entry.data.layerHeight) && (
+            <p class="plate__spec">
+              {entry.data.materials && <span>{entry.data.materials}</span>}
+              {entry.data.layerHeight && <span>{entry.data.layerHeight}</span>}
+            </p>
+          )
       }
     </div>
   </a>
@@ -159,6 +163,31 @@ const darkSrc = asset(srcDark);
     text-align: right;
     color: var(--ink-soft);
     line-height: 1.4;
+  }
+
+  /* Variante mosaico (home): la cella è proporzionata ~3:4 dalla griglia,
+     quindi cover riempie il riquadro senza cornice e il taglio cade solo
+     sui margini di sfondo della foto, mai sull'oggetto. */
+  .plate--tile .plate__media {
+    aspect-ratio: auto;
+  }
+  /* niente zoom al hover: ritaglierebbe i bordi dell'oggetto */
+  .plate--tile .plate__link:hover .plate__media img,
+  .plate--tile .plate__link:focus-visible .plate__media img {
+    transform: none;
+  }
+  /* meta su righe singole: altezza stabile, la cella resta ~3:4 */
+  .plate--tile .plate__title,
+  .plate--tile .plate__cat {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .plate--tile .plate__name {
+    min-width: 0;
+  }
+  .plate--tile .plate__title {
+    font-size: 1.05rem;
   }
 
   @media (max-width: 520px) {

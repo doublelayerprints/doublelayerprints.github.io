@@ -21,7 +21,15 @@ const t = (key: UIKey): string => ui[lang][key];
 const works = (await getCollection('works'))
   .filter((e) => e.id.endsWith(`.${lang}`))
   .sort((a, b) => a.data.order - b.data.order);
-const featured = works.filter((e) => e.data.featured).slice(0, 4);
+/* Selezione curata a mano per il mosaico della home: uno slug per cella,
+   nell'ordine di collocamento (la prima copre la cella grande 6×6).
+   Aggiornare questa lista per cambiare i pezzi in vetrina. */
+const spotlightSlugs = [
+  'mario', 'umbreon', 'sorcerer-mickey', 'tweety', 'daffy-duck', 'gardevoir', 'diddy-kong', 'shy-guy',
+] as const;
+const spotlight = spotlightSlugs
+  .map((slug) => works.find((e) => e.id.replace(/\.(it|en)$/, '') === slug))
+  .filter((e) => e !== undefined);
 
 const steps = [1, 2, 3] as const;
 const stepKey = (i: number, part: 'title' | 'text') =>
@@ -103,8 +111,8 @@ const sections: Array<{ id: string; label: UIKey }> = [
         <h2 class="section-title">{t('home.selected.title')}</h2>
         <p class="section-intro">{t('home.selected.intro')}</p>
       </div>
-      <div class="works-grid">
-        {featured.map((entry) => <div class="works-grid__cell"><ProductPlate entry={entry} lang={lang} /></div>)}
+      <div class="works-mosaic">
+        {spotlight.map((entry) => <div class="works-mosaic__cell"><ProductPlate entry={entry} lang={lang} variant="tile" /></div>)}
       </div>
       <div class="works-more">
         <a class="btn" href={pathFor('lavori', lang)}>{t('home.selected.all')}</a>
@@ -246,29 +254,64 @@ const sections: Array<{ id: string; label: UIKey }> = [
     }
   }
 
-  /* ---------- Griglia lavori (asimmetrica) ---------- */
-  .works-grid {
+  /* ---------- Mosaico lavori (bento) ---------- */
+  /* Tutte le foto di anteprima sono 3:4. Le tessere hanno span n×n e
+     l'altezza riga è derivata dalla larghezza colonna (r ≈ 4/3·c + meta):
+     l'area immagine resta ~3:4, così `cover` riempie il riquadro senza
+     cornice e taglia solo sfondo, mai l'oggetto. Con 8 tessere il
+     posizionamento automatico non lascia buche: 6+6 | 3+3 | 3+3 | 4+4+4. */
+  .works-mosaic {
+    --mos-cols: 4;
+    --mos-gap: clamp(0.6rem, 1.5vw, 1rem);
+    --mos-col: calc(
+      (min(100vw, var(--maxw)) - 2 * var(--gutter) - (var(--mos-cols) - 1) * var(--mos-gap)) /
+        var(--mos-cols)
+    );
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: clamp(1.4rem, 3vw, 2.4rem);
-    align-items: stretch;
+    grid-template-columns: repeat(var(--mos-cols), minmax(0, 1fr));
+    grid-auto-rows: calc(var(--mos-col) * 1.3333 + 26px);
+    gap: var(--mos-gap);
   }
-  .works-grid__cell {
-    grid-column: span 12;
-    height: 100%;
+  .works-mosaic__cell {
+    min-width: 0;
   }
+  /* telefono: grande in cima, coppie, grande finale */
+  .works-mosaic__cell:nth-child(8n + 1),
+  .works-mosaic__cell:nth-child(8n + 8) {
+    grid-column: span 4;
+    grid-row: span 4;
+  }
+  .works-mosaic__cell:nth-child(8n + 2),
+  .works-mosaic__cell:nth-child(8n + 3),
+  .works-mosaic__cell:nth-child(8n + 4),
+  .works-mosaic__cell:nth-child(8n + 5),
+  .works-mosaic__cell:nth-child(8n + 6),
+  .works-mosaic__cell:nth-child(8n + 7) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  /* ≥760px: 12 colonne — un 6×6, quattro 3×3, tre 4×4 */
   @media (min-width: 760px) {
-    .works-grid__cell:nth-child(4n + 1) {
-      grid-column: span 7;
+    .works-mosaic {
+      --mos-cols: 12;
+      --mos-gap: clamp(0.9rem, 2vw, 1.6rem);
     }
-    .works-grid__cell:nth-child(4n + 2) {
-      grid-column: span 5;
+    .works-mosaic__cell:nth-child(8n + 1) {
+      grid-column: span 6;
+      grid-row: span 6;
     }
-    .works-grid__cell:nth-child(4n + 3) {
-      grid-column: span 5;
+    .works-mosaic__cell:nth-child(8n + 2),
+    .works-mosaic__cell:nth-child(8n + 3),
+    .works-mosaic__cell:nth-child(8n + 4),
+    .works-mosaic__cell:nth-child(8n + 5) {
+      grid-column: span 3;
+      grid-row: span 3;
     }
-    .works-grid__cell:nth-child(4n + 4) {
-      grid-column: span 7;
+    .works-mosaic__cell:nth-child(8n + 6),
+    .works-mosaic__cell:nth-child(8n + 7),
+    .works-mosaic__cell:nth-child(8n + 8) {
+      grid-column: span 4;
+      grid-row: span 4;
     }
   }
   .works-more {
