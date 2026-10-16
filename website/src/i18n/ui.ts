@@ -79,10 +79,12 @@ export const ui = {
     'works.eyebrow': '; ARCHIVIO STAMPE / 0.12-0.28 MM',
     'works.title': 'I lavori',
     'works.intro':
-      'Tutto quello che è uscito dalle nostre stampanti e vale la pena mostrare. Filtra per categoria, apri un pezzo per vedere foto e specifiche.',
-    'works.filter.all': 'Tutti',
+      'Tutto quello che è uscito dalle nostre stampanti e vale la pena mostrare. Filtra per origine e categoria, apri un pezzo per vedere foto e specifiche.',
+    'works.filter.all': 'Tutte',
+    'works.filter.allOrigins': 'Tutte le origini',
+    'works.filter.originLabel': 'Filtra per origine',
     'works.filterLabel': 'Filtra per categoria',
-    'works.empty': 'Nessun pezzo in questa categoria, per ora.',
+    'works.empty': 'Nessun pezzo con questi filtri, per ora.',
     'works.count': 'pezzi',
 
     // Categorie
@@ -90,6 +92,10 @@ export const ui = {
     'cat.home': 'Casa',
     'cat.tools': 'Strumenti',
     'cat.art': 'Arte',
+
+    // Origine
+    'origin.original': 'Fatto da noi',
+    'origin.remix': 'Remix',
 
     // Dettaglio pezzo
     'work.back': 'Tutti i lavori',
@@ -223,16 +229,22 @@ export const ui = {
     'works.eyebrow': '; PRINT ARCHIVE / 0.12-0.28 MM',
     'works.title': 'The works',
     'works.intro':
-      'Everything that came out of our printers and is worth showing. Filter by category, open a piece for photos and specs.',
+      'Everything that came out of our printers and is worth showing. Filter by origin and category, open a piece for photos and specs.',
     'works.filter.all': 'All',
+    'works.filter.allOrigins': 'All origins',
+    'works.filter.originLabel': 'Filter by origin',
     'works.filterLabel': 'Filter by category',
-    'works.empty': 'No pieces in this category, yet.',
+    'works.empty': 'No pieces with these filters, yet.',
     'works.count': 'pieces',
 
     'cat.figures': 'Figures',
     'cat.home': 'Home',
     'cat.tools': 'Tools',
     'cat.art': 'Art',
+
+    // Origin
+    'origin.original': 'Made by us',
+    'origin.remix': 'Remix',
 
     'work.back': 'All works',
     'work.specs': 'Print specs',

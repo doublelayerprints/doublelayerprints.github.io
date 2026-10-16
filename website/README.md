@@ -15,7 +15,8 @@ npm run placeholders  # rigenera le immagini placeholder dei pezzi
 
 ## Aggiungere un pezzo alla galleria
 
-1. Metti le foto in `public/images/works/` (consigliato: 2–3 per pezzo, le prime in formato 4:3).
+1. Metti le foto in `public/images/works/` (consigliato: 2–3 per pezzo, le prime
+   in formato verticale 3:4 — le anteprime mostrano la figura intera).
 2. Crea due file in `src/content/works/`:
    - `mio-pezzo.it.md` (versione italiana)
    - `mio-pezzo.en.md` (versione inglese)

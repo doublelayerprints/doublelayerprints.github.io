@@ -10,7 +10,7 @@ photos:
   - 'images/works/geometric-planter-1.svg'
   - 'images/works/geometric-planter-2.svg'
 alt: 'Vaso geometrico stampato in 3D per succulente, con superficie sfaccettata'
-featured: true
+featured: false
 order: 2
 ---
 

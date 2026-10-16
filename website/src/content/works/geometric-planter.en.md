@@ -10,7 +10,7 @@ photos:
   - 'images/works/geometric-planter-1.svg'
   - 'images/works/geometric-planter-2.svg'
 alt: '3D printed geometric planter for succulents, with a faceted surface'
-featured: true
+featured: false
 order: 2
 ---
 

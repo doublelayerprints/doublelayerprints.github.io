@@ -11,7 +11,7 @@ photos:
   - 'images/works/dragon-bust-2.svg'
   - 'images/works/dragon-bust-3.svg'
 alt: 'Busto di drago stampato in 3D in PLA silk viola, con scaglie e zanne molto dettagliate'
-featured: true
+featured: false
 order: 1
 ---
 

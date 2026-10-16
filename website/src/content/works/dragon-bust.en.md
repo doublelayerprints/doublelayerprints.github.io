@@ -11,7 +11,7 @@ photos:
   - 'images/works/dragon-bust-2.svg'
   - 'images/works/dragon-bust-3.svg'
 alt: '3D printed dragon bust in purple silk PLA, with highly detailed scales and fangs'
-featured: true
+featured: false
 order: 1
 ---
 

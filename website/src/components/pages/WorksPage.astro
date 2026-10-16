@@ -22,6 +22,10 @@ const cats = ['all', 'figures', 'home', 'tools', 'art'] as const;
 const catLabel = (c: string) =>
   c === 'all' ? t('works.filter.all') : t(`cat.${c}` as UIKey);
 
+const origins = ['all', 'original', 'remix'] as const;
+const originLabel = (o: string) =>
+  o === 'all' ? t('works.filter.allOrigins') : t(`origin.${o}` as UIKey);
+
 const sections: Array<{ id: string; label: UIKey }> = [
   { id: 'archivio', label: 'rail.archive' },
   { id: 'pezzi', label: 'rail.pieces' },
@@ -40,14 +44,25 @@ const sections: Array<{ id: string; label: UIKey }> = [
       </div>
 
       <div class="controls">
-        <div class="chips" role="group" aria-label={t('works.filterLabel')}>
-          {
-            cats.map((c) => (
-              <button class="chip" type="button" data-filter={c} aria-pressed={c === 'all' ? 'true' : 'false'}>
-                {catLabel(c)}
-              </button>
-            ))
-          }
+        <div class="controls__groups">
+          <div class="chips" role="group" aria-label={t('works.filter.originLabel')}>
+            {
+              origins.map((o) => (
+                <button class="chip" type="button" data-filter-origin={o} aria-pressed={o === 'all' ? 'true' : 'false'}>
+                  {originLabel(o)}
+                </button>
+              ))
+            }
+          </div>
+          <div class="chips" role="group" aria-label={t('works.filterLabel')}>
+            {
+              cats.map((c) => (
+                <button class="chip" type="button" data-filter-cat={c} aria-pressed={c === 'all' ? 'true' : 'false'}>
+                  {catLabel(c)}
+                </button>
+              ))
+            }
+          </div>
         </div>
         <p class="count">
           <span data-count>{works.length}</span> {t('works.count')}
@@ -57,7 +72,7 @@ const sections: Array<{ id: string; label: UIKey }> = [
       <div class="works-grid" data-grid id="pezzi">
         {
           works.map((entry) => (
-            <div class="works-grid__cell" data-category={entry.data.category}>
+            <div class="works-grid__cell" data-category={entry.data.category} data-origin={entry.data.origin}>
               <ProductPlate entry={entry} lang={lang} />
             </div>
           ))
@@ -74,23 +89,43 @@ const sections: Array<{ id: string; label: UIKey }> = [
 </Base>
 
 <script is:inline>
-  const chips = document.querySelectorAll('[data-filter]');
+  const originChips = document.querySelectorAll('[data-filter-origin]');
+  const catChips = document.querySelectorAll('[data-filter-cat]');
   const cells = document.querySelectorAll('[data-grid] > [data-category]');
   const counter = document.querySelector('[data-count]');
   const empty = document.querySelector('[data-empty]');
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const f = chip.dataset.filter;
-      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-      let visible = 0;
-      cells.forEach((cell) => {
-        const show = f === 'all' || cell.dataset.category === f;
-        cell.hidden = !show;
-        if (show) visible++;
-      });
-      if (counter) counter.textContent = String(visible);
-      if (empty) empty.hidden = visible > 0;
+
+  let originFilter = 'all';
+  let catFilter = 'all';
+
+  const applyFilters = () => {
+    let visible = 0;
+    cells.forEach((cell) => {
+      const show =
+        (originFilter === 'all' || cell.dataset.origin === originFilter) &&
+        (catFilter === 'all' || cell.dataset.category === catFilter);
+      cell.hidden = !show;
+      if (show) visible++;
     });
+    if (counter) counter.textContent = String(visible);
+    if (empty) empty.hidden = visible > 0;
+  };
+
+  const wireChips = (chips, datasetKey, setFilter) => {
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        setFilter(chip.dataset[datasetKey]);
+        applyFilters();
+      });
+    });
+  };
+
+  wireChips(originChips, 'filterOrigin', (v) => {
+    originFilter = v;
+  });
+  wireChips(catChips, 'filterCat', (v) => {
+    catFilter = v;
   });
 </script>
 
@@ -106,6 +141,11 @@ const sections: Array<{ id: string; label: UIKey }> = [
   .chips {
     display: flex;
     flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+  .controls__groups {
+    display: flex;
+    flex-direction: column;
     gap: 0.55rem;
   }
   .count {

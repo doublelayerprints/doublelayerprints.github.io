@@ -10,7 +10,7 @@ photos:
   - 'images/works/cyber-warrior-1.svg'
   - 'images/works/cyber-warrior-2.svg'
 alt: 'Action figure cyberpunk articolata, stampata in 3D in PLA+ con visiera in resina'
-featured: true
+featured: false
 order: 3
 ---
 

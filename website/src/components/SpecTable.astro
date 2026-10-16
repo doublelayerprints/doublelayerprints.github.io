@@ -8,25 +8,29 @@ interface Props {
 }
 const { entry, lang } = Astro.props;
 const t = (key: UIKey): string => ui[lang][key];
-const rows: Array<[UIKey, string]> = [
-  ['spec.material', entry.data.materials],
-  ['spec.dimensions', entry.data.dimensions],
-  ['spec.layer', entry.data.layerHeight],
-  ['spec.weight', entry.data.weight],
-  ['spec.time', entry.data.printTime],
-];
+const rows: Array<[UIKey, string]> = (
+  [
+    ['spec.material', entry.data.materials],
+    ['spec.dimensions', entry.data.dimensions],
+    ['spec.layer', entry.data.layerHeight],
+    ['spec.weight', entry.data.weight],
+    ['spec.time', entry.data.printTime],
+  ] as Array<[UIKey, string | undefined]>
+).filter((row): row is [UIKey, string] => Boolean(row[1]));
 ---
 
-<dl class="specs">
-  {
-    rows.map(([key, value]) => (
-      <div class="specs__row">
-        <dt>{t(key)}</dt>
-        <dd>{value}</dd>
-      </div>
-    ))
-  }
-</dl>
+{rows.length > 0 && (
+  <dl class="specs">
+    {
+      rows.map(([key, value]) => (
+        <div class="specs__row">
+          <dt>{t(key)}</dt>
+          <dd>{value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+)}
 
 <style>
   .specs {

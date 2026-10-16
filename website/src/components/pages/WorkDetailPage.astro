@@ -17,15 +17,23 @@ const { entry, lang } = Astro.props;
 const t = (key: UIKey): string => ui[lang][key];
 const slug = entry.id.replace(/\.(it|en)$/, '');
 const catKey = `cat.${entry.data.category}` as UIKey;
+const originKey = `origin.${entry.data.origin}` as UIKey;
 const contentHtml = entry.rendered?.html ?? '';
 const firstParagraph = entry.body?.split('\n\n')[0]?.slice(0, 155) ?? '';
 const prefill = t('work.whatsappPrefill').replace('{title}', entry.data.title);
 const isPlaceholder = entry.data.photos[0].endsWith('.svg');
 const darkVariant = (p: string) => p.replace(/\.svg$/, '-dark.svg');
+const hasSpecs = Boolean(
+  entry.data.materials ||
+    entry.data.dimensions ||
+    entry.data.layerHeight ||
+    entry.data.weight ||
+    entry.data.printTime,
+);
 
 const sections: Array<{ id: string; label: UIKey }> = [
   { id: 'pezzo', label: 'rail.piece' },
-  { id: 'specifiche', label: 'rail.specs' },
+  ...(hasSpecs ? [{ id: 'specifiche', label: 'rail.specs' }] : []),
   { id: 'parliamone', label: 'rail.talk' },
 ];
 ---
@@ -46,11 +54,11 @@ const sections: Array<{ id: string; label: UIKey }> = [
         <div class="detail__photos">
           <figure class="photo photo--main">
             <img
-              class={isPlaceholder ? 'photo--light' : undefined}
+              class={isPlaceholder ? 'photo--light' : 'photo--real'}
               src={asset(entry.data.photos[0])}
               alt={entry.data.alt}
               width="1200"
-              height="900"
+              height={isPlaceholder ? 900 : 1600}
               decoding="async"
             />
             {
@@ -70,13 +78,13 @@ const sections: Array<{ id: string; label: UIKey }> = [
             entry.data.photos.length > 1 && (
               <div class="detail__thumbs">
                 {entry.data.photos.slice(1).map((p) => (
-                  <div class="photo photo--thumb">
+                  <div class={isPlaceholder ? 'photo photo--thumb' : 'photo photo--thumb photo--thumb--tall'}>
                     <img
                       class={isPlaceholder ? 'photo--light' : undefined}
                       src={asset(p)}
                       alt=""
                       width="600"
-                      height="450"
+                      height="800"
                       loading="lazy"
                       decoding="async"
                     />
@@ -100,15 +108,19 @@ const sections: Array<{ id: string; label: UIKey }> = [
         </div>
 
         <div class="detail__info">
-          <p class="detail__cat">; {t(catKey).toUpperCase()}</p>
+          <p class="detail__cat">; {t(catKey).toUpperCase()} — {t(originKey).toUpperCase()}</p>
           <h1 class="detail__title">{entry.data.title}</h1>
           <div class="prose detail__desc" set:html={contentHtml} />
 
-          <div id="specifiche">
-            <p class="detail__specs-eyebrow" aria-hidden="true">; SLICER DATA</p>
-            <h2 class="detail__specs-title">{t('work.specs')}</h2>
-            <SpecTable entry={entry} lang={lang} />
-          </div>
+          {
+            hasSpecs && (
+              <div id="specifiche">
+                <p class="detail__specs-eyebrow" aria-hidden="true">; SLICER DATA</p>
+                <h2 class="detail__specs-title">{t('work.specs')}</h2>
+                <SpecTable entry={entry} lang={lang} />
+              </div>
+            )
+          }
 
           <div class="detail__cta">
             <a
@@ -178,6 +190,9 @@ const sections: Array<{ id: string; label: UIKey }> = [
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
+  .photo--main img.photo--real {
+    aspect-ratio: auto;
+  }
   .detail__thumbs {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -189,6 +204,10 @@ const sections: Array<{ id: string; label: UIKey }> = [
     border: 1px solid var(--line-dark);
     padding: 0.3rem;
     background: var(--paper-dim);
+  }
+  /* foto vere in verticale: miniatura 3:4 = figura intera, senza crop */
+  .photo--thumb--tall {
+    aspect-ratio: 3 / 4;
   }
   .photo--thumb img {
     width: 100%;

@@ -11,6 +11,7 @@ const { entry, lang } = Astro.props;
 const t = (key: UIKey): string => ui[lang][key];
 const slug = entry.id.replace(/\.(it|en)$/, '');
 const catKey = `cat.${entry.data.category}` as UIKey;
+const originKey = `origin.${entry.data.origin}` as UIKey;
 const src = entry.data.photos[0];
 const srcAlt = entry.data.alt;
 const isSvg = src.endsWith('.svg');
@@ -22,13 +23,13 @@ const darkSrc = asset(srcDark);
 <article class="plate" data-category={entry.data.category}>
   <a class="plate__link" href={pathFor(`lavori/${slug}`, lang)}>
     <i class="plate__gold" aria-hidden="true"></i>
-    <div class="plate__media">
+    <div class={isSvg ? 'plate__media' : 'plate__media plate__media--tall'}>
       <img
         class={isSvg ? 'plate__img--light' : undefined}
         src={srcLight}
         alt={srcAlt}
         width="1200"
-        height="900"
+        height={isSvg ? 900 : 1600}
         loading="lazy"
         decoding="async"
       />
@@ -49,12 +50,16 @@ const darkSrc = asset(srcDark);
     <div class="plate__meta">
       <div class="plate__name">
         <h3 class="plate__title">{entry.data.title}</h3>
-        <p class="plate__cat">{t(catKey)}</p>
+        <p class="plate__cat">{t(catKey)}&nbsp;·&nbsp;{t(originKey)}</p>
       </div>
-      <p class="plate__spec">
-        <span>{entry.data.materials}</span>
-        <span>{entry.data.layerHeight}</span>
-      </p>
+      {
+        (entry.data.materials || entry.data.layerHeight) && (
+          <p class="plate__spec">
+            {entry.data.materials && <span>{entry.data.materials}</span>}
+            {entry.data.layerHeight && <span>{entry.data.layerHeight}</span>}
+          </p>
+        )
+      }
     </div>
   </a>
 </article>
@@ -99,6 +104,10 @@ const darkSrc = asset(srcDark);
     overflow: hidden;
     background: var(--paper-dim);
     border-bottom: 1px solid var(--line-dark);
+  }
+  /* foto vere in verticale: riquadro 3:4 = figura intera, senza crop */
+  .plate__media--tall {
+    aspect-ratio: 3 / 4;
   }
   .plate__media img {
     width: 100%;

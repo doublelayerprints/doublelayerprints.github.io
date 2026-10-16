@@ -10,7 +10,7 @@ photos:
   - 'images/works/loop-sculpture-1.svg'
   - 'images/works/loop-sculpture-2.svg'
 alt: 'Continuous ribbon sculpture, 3D printed in marble-effect PLA'
-featured: true
+featured: false
 order: 4
 ---
 
