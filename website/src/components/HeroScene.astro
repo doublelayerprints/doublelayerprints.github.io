@@ -1,17 +1,21 @@
 ---
 /**
- * Scena hero "Deposizione" — il pin che stampa l'hero strato per strato.
- * Lo scroll dentro lo stage (~240svh) definisce il target di progresso
- * (0→1) e il progresso VISIBLE lo insegue a ritmo macchina limitato,
- * così anche uno scroll veloce lascia vedere gli strati (CAP 0.7/s:
- * l'intera stampa attraversa in ~1.4s comunque si scrolli). Tutto
- * scroll-linked; il JS è solo il clock, le trasformazioni nel CSS.
- * Solo in discesa (2026-10-14): in risalita niente animazione inversa,
- * la scena si fissa al riposo pieno e «la pagina è semplicemente
- * visibile»; ricominciando a scendere si rialinea senza scatti.
- * Attiva solo con JS e senza preferenza ridotta, e solo ≥760px: sotto,
- * l'hero resta statico (su telefono pin e stage allungato creavano
- * spazio morto e flick; 2026-10-13). Altrimenti statico.
+ * Scena hero "Deposizione" — l'intro che stampa l'hero strato per
+ * strato all'arrivo in home. Dal 2026-10-16 è una timeline temporale
+ * (~2.35s): prima il progresso era schiavizzato allo scroll, con
+ * l'hero pinnato su uno stage da 240svh; ora la pagina è alta quanto
+ * il suo contenuto e lo scroll scende dal primo istante.
+ * Il primo paint è la pagina intera (il riposo coincide con i default
+ * CSS), poi la timeline percorre le stesse finestre di prima: pausa,
+ * dissolvenza, piatto, stampa a strati (foto + scritta), rilascio.
+ * Qualsiasi input — rotella, touch, tastiera, scroll reale — completa
+ * l'intro all'istante (data-scene-skip rilascia subito anche tagline
+ * e CTA). Se la pagina si apre già scrollata (back/refresh) niente
+ * intro; con bfcache si riprende a riposo. Attiva solo con JS e senza
+ * prefers-reduced-motion, a ogni larghezza (sotto 760px era statica
+ * fino al 2026-10-16: le ragioni — pin, stage allungato, flick —
+ * non esistono più senza scroll). Il JS è solo il clock; le
+ * trasformazioni stanno nel CSS.
  */
 interface Props {
   id?: string;
@@ -51,54 +55,22 @@ const { id } = Astro.props;
     var ease = function (t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; };
     var W = function (p, a, b) { return ease(wing(p, a, b)); };
 
-    var nav = document.querySelector('.nav');
     var rows = Array.prototype.slice.call(document.querySelectorAll('.gcode .gl'));
     var count = scene.querySelector('[data-count]');
 
-    var navH = 64;
-    var stageTop = 0;
-    var len = 1;
-
-    var measure = function () {
-      navH = nav ? nav.offsetHeight : 64;
-      scene.style.setProperty('--scene-top', navH + 'px');
-      stageTop = stage.getBoundingClientRect().top + window.scrollY;
-      len = Math.max(320, stage.offsetHeight - scene.offsetHeight);
-    };
-
     var pad3 = function (n) { return String(n).padStart(3, '0'); };
 
-    /* Orologio della stampante: il target arriva dallo scroll, il
-       progresso visibile lo insegue con velocità limitata (CAP p/s)
-       e correttive snappy (K). Cap di 0.7: l'intera stampa occupa
-       ~1.4s anche con un scroll violento, quindi ogni strato si vede.
-       Fuori viewport si azzera (niente lavoro invisibile). */
-    var K = 20;
-    var CAP = 0.7;
-    var cur = 0;
-    var target = 0;
-    var raf = 0;
-    var last = 0;
-    var inView = true;
-
-    /* Direzione di scroll (richiesta 2026-10-14): la stampa avviene solo
-       in discesa. In risalita nessuna animazione all'indietro: la scena
-       si fissa al riposo pieno (p = 1, la pagina è semplicemente visibile)
-       e il latch dura fino alla ripresa in discesa, dove il progresso si
-       rialinea al punto corrente prima di inseguire in avanti. */
-    var prevY = window.scrollY;
-    var atRest = false;
-
+    /* Le finestre della scena sono quelle di sempre (documentate in
+       global.css): 10–24% cancella il materiale (foto + scritta —
+       l'inchiostro scivola su −14px mentre svanisce), 4–26% il bed
+       si arma, 28–60% la finestra di stampa (foto E scritta, a
+       strati con anteprima al registro, testa viva solo lì, il
+       contatore e la riga G-code in esecuzione), 68–90% rilascio
+       (l'inchiostro torna pieno, le fasce svaniscono). I
+       plate-ghost vivono SOLO nella finestra di dissolvenza.
+       Il progresso ora arriva dal tempo, non dallo scroll: stessa
+       estetica, driver diverso. */
     var apply = function (p) {
-      /* Finestre scena: 10–24% cancella il materiale (foto + scritta —
-         l'inchiostro scivola su −14px mentre svanisce), 4–26% il bed
-         si arma, 28–60% la finestra di stampa (foto E scritta, a
-         strati con anteprima al registro, testa viva solo lì, il
-         contatore e la riga G-code in esecuzione), 68–90% rilascio
-         (l'inchiostro torna pieno, le fasce svaniscono). I
-         plate-ghost vivono SOLO nella finestra di dissolvenza.
-         Stima coerente per la scritta: h 2026-10-13 — niente arrivi
-         scivolanti, i glifi si riempiono a registro. */
       var pFade = W(p, 0.10, 0.24);
       var pp = W(p, 0.28, 0.60);
       var printEnd = 1 - W(p, 0.68, 0.90);
@@ -134,139 +106,135 @@ const { id } = Astro.props;
       }
     };
 
-    var computeTarget = function () {
-      return clamp((window.scrollY + navH - stageTop) / len, 0, 1);
+    /* Timeline: segmenti [pDa, pA, secondi]. Le durate comprimono in
+       ~2.35s ciò che prima dipendeva da ~1.4 schermate di scroll.
+       Dentro ogni finestra vale l'easing W(); il raccordo tra
+       segmenti è lineare sulla stessa p, quindi senza scatti. */
+    var SEGS = [
+      [0.0, 0.10, 0.20],  /* pausa: la pagina intera si vede */
+      [0.10, 0.28, 0.35], /* dissolvenza + bed che si arma */
+      [0.28, 0.60, 1.25], /* stampa strato per strato */
+      [0.60, 0.68, 0.10], /* pausa sull'oggetto stampato */
+      [0.68, 1.00, 0.45]  /* rilascio: l'inchiostro torna pieno */
+    ];
+    var TOTAL = 0;
+    for (var i = 0; i < SEGS.length; i++) TOTAL += SEGS[i][2];
+
+    var pAt = function (t) {
+      var i, s;
+      t = clamp(t, 0, TOTAL);
+      for (i = 0; i < SEGS.length; i++) {
+        s = SEGS[i];
+        if (t <= s[2]) return s[0] + (s[1] - s[0]) * (t / s[2]);
+        t -= s[2];
+      }
+      return 1;
     };
+
+    var raf = 0;
+    var t0 = 0;
+    var started = false;
+    var done = false;
 
     var stopLoop = function () {
       if (raf) {
         cancelAnimationFrame(raf);
         raf = 0;
       }
-      last = 0;
     };
 
     var tick = function (now) {
       raf = 0;
-      var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
-      last = now;
-      var dist = target - cur;
-      var speed = Math.min(K * Math.abs(dist), CAP);
-      cur += Math.sign(dist) * Math.min(Math.abs(dist), speed * dt);
-      apply(cur);
-      if (Math.abs(target - cur) < 0.0008) {
-        cur = target;
-        apply(cur);
-        stopLoop();
-      } else {
-        raf = requestAnimationFrame(tick);
-      }
-    };
-
-    var seek = function () {
-      if (!liveShown) return; /* mobile: niente scena, niente lavoro */
-      var y = window.scrollY;
-      var goingUp = y < prevY;
-      prevY = y;
-      target = computeTarget();
-      if (goingUp) {
-        /* Risalita: la pagina è semplicemente visibile, senza scena. */
-        stopLoop();
-        cur = 1;
-        atRest = true;
-        apply(cur);
-        return;
-      }
-      if (!inView) {
-        stopLoop();
-        cur = target;
-        apply(cur);
-        return;
-      }
-      if (atRest && cur > target) {
-        /* Ripresa in discesa: riallinea il progresso al punto corrente
-           (nemmeno un salto di stato), poi insegna in avanti. */
-        cur = target;
-        apply(cur);
-      }
-      atRest = false;
-      if (!raf) {
-        last = 0;
-        raf = requestAnimationFrame(tick);
-      }
-    };
-
-    var snap = function () {
-      measure();
-      target = computeTarget();
-      stopLoop();
-      cur = atRest ? 1 : target;
-      apply(cur);
-    };
-
-    var tickingResize = false;
-    var onResize = function () {
-      if (tickingResize) return;
-      tickingResize = true;
-      requestAnimationFrame(function () {
-        tickingResize = false;
-        measure();
-        if (!raf) {
-          snap();
-        } else {
-          target = computeTarget();
-        }
-      });
-    };
-
-    /* La scena vive solo ≥760px: sotto, l'hero resta naturale e statico
-       (niente pin, niente spazio morto, la foto non svanisce). La
-       commutazione è una sola fonte: l'attributo data-scene-live — senza
-       di lui ogni regola .hero-stage[data-scene-live] è inerte. */
-    var mqPhone = window.matchMedia('(max-width: 759px)');
-    var liveShown = false;
-
-    var setLive = function (on) {
-      if (on === liveShown) return;
-      liveShown = on;
-      if (on) {
-        stage.setAttribute('data-scene-live', '');
-      } else {
+      if (!t0) t0 = now;
+      var p = pAt((now - t0) / 1000);
+      apply(p);
+      if (p >= 1) {
+        done = true;
+        detachSkip();
+        /* A riposo la scena coincide con i default CSS: via
+           l'attributo, si rilasciano i layer will-change. */
         stage.removeAttribute('data-scene-live');
-        stopLoop();
+        return;
       }
+      raf = requestAnimationFrame(tick);
     };
 
-    var onPhone = function () {
-      setLive(!mqPhone.matches);
-      snap();
+    /* Skip: qualsiasi intento di scroll completa l'intro. Il listener
+       `scroll` copre anche il ripristino della posizione (back dal
+       browser, refresh a metà pagina): se la pagina si apre già
+       scrollata l'intro non parte proprio. */
+    var SKIP_KEYS = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'End', 'Home'];
+    var skipOn = false;
+
+    var onWheel = function () { finish(); };
+    var onTouch = function () { finish(); };
+    var onScroll = function () { if (window.scrollY > 4) finish(); };
+    var onKey = function (e) {
+      if (SKIP_KEYS.indexOf(e.key) !== -1) finish();
     };
 
-    setLive(!mqPhone.matches);
-    snap();
-    requestAnimationFrame(snap);
-    window.addEventListener('load', snap);
+    var attachSkip = function () {
+      if (skipOn) return;
+      skipOn = true;
+      window.addEventListener('wheel', onWheel, { passive: true });
+      window.addEventListener('touchstart', onTouch, { passive: true });
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('keydown', onKey);
+    };
+
+    var detachSkip = function () {
+      if (!skipOn) return;
+      skipOn = false;
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouch);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('keydown', onKey);
+    };
+
+    var finish = function () {
+      if (done) return;
+      done = true;
+      stopLoop();
+      detachSkip();
+      /* Rilascia subito tagline e CTA (niente attesa dei delay) e
+         fissa il riposo pieno: la pagina è semplicemente visibile. */
+      stage.setAttribute('data-scene-skip', '');
+      stage.removeAttribute('data-scene-live');
+      apply(1);
+    };
+
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) finish(); /* bfcache: si riprende a riposo */
+    });
+
+    stage.setAttribute('data-scene-live', '');
+
+    /* Pagina aperta già scrollata: niente scena, solo il rilascio
+       dei delay di tagline/CTA. */
+    if (window.scrollY > 4) {
+      finish();
+    } else {
+      attachSkip();
+    }
+
+    /* Parte al primo frame utile: dopo i font (le copie a strati
+       della scritta devono misurarsi col carattere vero), con rete
+       di sicurezza se fonts.ready tarda. */
+    var kickoff = function () {
+      if (started || done) return;
+      started = true;
+      apply(0);
+      raf = requestAnimationFrame(tick);
+    };
+    var kicked = false;
+    var kickoffGuard = function () {
+      if (kicked) return;
+      kicked = true;
+      kickoff();
+    };
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(snap);
+      document.fonts.ready.then(kickoffGuard);
     }
-    window.addEventListener('scroll', seek, { passive: true });
-    window.addEventListener('resize', onResize);
-    if (mqPhone.addEventListener) {
-      mqPhone.addEventListener('change', onPhone);
-    } else if (mqPhone.addListener) {
-      mqPhone.addListener(onPhone);
-    }
-    if (window.ResizeObserver) {
-      new ResizeObserver(onResize).observe(document.documentElement);
-    }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(
-        function (entries) {
-          inView = entries[0].isIntersecting;
-          seek();
-        },
-        { rootMargin: '25% 0px 25% 0px' }
-      ).observe(stage);
-    }
+    setTimeout(kickoffGuard, 700);
   })();
 </script>

@@ -525,40 +525,32 @@ h4 {
   .anim-laydown:nth-child(4) {
     animation-delay: 0.3s;
   }
+  /* Con l'intro "Deposizione" (2026-10-16) tagline e CTA salgono al
+     rilascio, quando l'inchiostro torna pieno; se l'intro viene
+     interrotta, [data-scene-skip] li rilascia subito. */
   .anim-rise {
-    animation: rise 0.7s ease 0.65s both;
+    animation: rise 0.7s ease 1.9s both;
   }
   .anim-rise-late {
-    animation: rise 0.7s ease 0.85s both;
+    animation: rise 0.7s ease 2.05s both;
   }
 }
 
 /* ------------------------------------------------------------
-   Scena hero "Deposizione" — il pin che stampa la home strato
-   per strato. Il JS (HeroScene) è solo il clock: scrive le var
-   di progresso sulla scena; qui tutte le trasformazioni.
+   Scena hero "Deposizione" — l'intro che stampa la home strato
+   per strato all'arrivo. Il JS (HeroScene) è solo il clock di una
+   timeline temporale (~2.35s): scrive le var di progresso sulla
+   scena; qui tutte le trasformazioni. Prima del 2026-10-16 il
+   progresso era schiavizzato allo scroll con l'hero pinnato su
+   uno stage da 240svh: ora la pagina è alta quanto il contenuto
+   e lo scroll scende dal primo istante.
    Tutto vive dentro .hero-stage[data-scene-live]: senza JS o
    con reduced-motion l'attributo non esiste e la pagina è
-   esattamente quella di oggi.
+   esattamente quella statica. Lo stato di riposo (p=0 e p=1)
+   coincide con i default CSS: il primo paint è la pagina intera.
+   A ogni larghezza: senza scroll non c'è più motivo di escludere
+   il mobile.
    ------------------------------------------------------------ */
-.hero-stage[data-scene-live] {
-  position: relative;
-  height: 240svh;
-}
-
-@media (min-width: 760px) {
-  .hero-stage[data-scene-live] .hero-scene {
-    position: sticky;
-    top: var(--scene-top, 4rem);
-    min-height: calc(100svh - var(--scene-top, 4rem));
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .hero-stage[data-scene-live] .hero-scene > .hero {
-    width: 100%;
-  }
-}
 
 /* Plate foto: fermo in posizione — nessuna rotazione d'asse (richiesta
    2026-10-13: l'immagine resta fissa); l'effetto strato vive dentro la
@@ -607,8 +599,7 @@ h4 {
    (FDM, più fin di prima su richiesta del 2026-10-13). La maschera
    clip-path per fascia e il deposito derivano da --pp / --i / --n,
    allineati al wordmark. Il var --n qui è la fonte: i default dei
-   figli si leggono solo se il nodo padre non c'è. Foto, bed e
-   contatore guardano solo ≥760px: sotto resta la coda leggera. */
+   figli si leggono solo se il nodo padre non c'è. */
 .hero__imgwrap {
   position: relative;
   overflow: hidden;
@@ -650,104 +641,100 @@ h4 {
   transform: translateY(calc(var(--k-press, 0) * 9px));
 }
 
-@media (min-width: 760px) {
-  .hero-stage[data-scene-live] .scene-bed {
-    width: calc(var(--k-bed, 0) * 100%);
-    opacity: var(--k-bed, 0);
-  }
-  .hero-stage[data-scene-live] .scene-count {
-    opacity: min(1, calc(var(--k-count, 0) * 25));
-  }
+/* Skip dell'intro (input dell'utente o pagina aperta già scrollata):
+   senza animazione tagline e CTA tornano al naturale, visibili,
+   senza aspettare i loro delay. */
+.hero-stage[data-scene-skip] .anim-rise,
+.hero-stage[data-scene-skip] .anim-rise-late {
+  animation: none;
+}
 
-  /* Le fasce della foto: ognuna copia la propria banda con
-      clip-path, scende da -26px e si deposita bottom-up. */
-  .hero-stage[data-scene-live] .hero__band {
-    will-change: transform, opacity;
-    clip-path: inset(
-      calc((1 - (var(--i, 0) + 1) / var(--n, 40)) * 100%) 0
-        calc(var(--i, 0) / var(--n, 40) * 100%) 0
-    );
-    opacity: calc(
-      clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1) *
-        (1 - var(--k-pfade, 0))
-    );
-    transform: translateY(
+.hero-stage[data-scene-live] .scene-bed {
+  width: calc(var(--k-bed, 0) * 100%);
+  opacity: var(--k-bed, 0);
+}
+.hero-stage[data-scene-live] .scene-count {
+  opacity: min(1, calc(var(--k-count, 0) * 25));
+}
+
+/* Le fasce della foto: ognuna copia la propria banda con
+    clip-path, scende da -26px e si deposita bottom-up. */
+.hero-stage[data-scene-live] .hero__band {
+  will-change: transform, opacity;
+  clip-path: inset(
+    calc((1 - (var(--i, 0) + 1) / var(--n, 40)) * 100%) 0
+      calc(var(--i, 0) / var(--n, 40) * 100%) 0
+  );
+  opacity: calc(
+    clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1) *
+      (1 - var(--k-pfade, 0))
+  );
+  transform: translateY(
+    calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
+  );
+}
+.hero-stage[data-scene-live] .hero__band:nth-child(odd) {
+  transform: translateY(
       calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
+    )
+    translateX(
+      calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * 9px)
     );
-  }
-  .hero-stage[data-scene-live] .hero__band:nth-child(odd) {
-    transform: translateY(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
-      )
-      translateX(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * 9px)
-      );
-  }
-  .hero-stage[data-scene-live] .hero__band:nth-child(even) {
-    transform: translateY(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
-      )
-      translateX(
-        calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -9px)
-      );
-  }
-
-  /* Niente strato oltre la testa d'oro: il contenitore delle fasce è
-     tagliato alla linea della print-head — il nuovo strato nasce sotto
-     la linea, come in una stampa vera. La testa è sorella di .hero__bands
-     (dentro .hero__imgwrap) per non finire tagliata lei stessa. */
-  .hero-stage[data-scene-live] .hero__bands {
-    clip-path: inset(calc((1 - var(--pp, 0)) * 100%) 0 0 0);
-  }
-
-  /* Il frontier della stampa: la testa d'oro risale la foto.
-     Vita propria solo durante la finestra di stampa (--k-head),
-     mai durante la dissolvenza che la precede. */
-  .hero-stage[data-scene-live] .print-head {
-    bottom: calc(var(--pp, 0) * 100%);
-    opacity: var(--k-head, 0);
-  }
-
-  /* Plate fantasma sotto la foto: lo spessore steso dell'oggetto.
-     La deriva è orizzontale (layer shift ai lati, come le fasce con
-     il loro micro-offset X): non verticale, onde evitare che il
-     plate vada a sbattere sopra la didascalia (fix 2026-10-13). */
-  .hero__ghost {
-    position: absolute;
-    top: 0.55rem;
-    left: 0.55rem;
-    right: 0.55rem;
-    aspect-ratio: 4 / 3;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .hero-stage[data-scene-live] .hero__ghost {
-    opacity: var(--k-ghost, 0);
-  }
-  .hero-stage[data-scene-live] .hero__ghost[data-ghost='1'] {
-    translate: calc(var(--k-ghost, 0) * 14px) 0;
-    scale: 0.975;
-    background: var(--paper-dim);
-    border: 1px solid var(--line-dark);
-  }
-  .hero-stage[data-scene-live] .hero__ghost[data-ghost='2'] {
-    translate: calc(var(--k-ghost, 0) * -14px) 0;
-    scale: 0.95;
-    background: color-mix(in srgb, var(--purple) 12%, var(--paper-dim));
-    border: 1px solid color-mix(in srgb, var(--purple) 55%, transparent);
-  }
+}
+.hero-stage[data-scene-live] .hero__band:nth-child(even) {
+  transform: translateY(
+      calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -26px)
+    )
+    translateX(
+      calc((1 - clamp(0, calc(var(--pp, 0) * var(--n, 40) - var(--i, 0)), 1)) * -9px)
+    );
 }
 
-/* Cintura mobile: sotto 760px l'hero resta naturale anche se l'attributo
-   scena fosse presente (il JS non lo pone; qui il contratto è esplicito).
-   A fine file per vincere la cascata a parità di specificità.
-   Niente stage allungato = niente spazio morto; niente dissolvenza =
-   niente flick della foto. */
-@media (max-width: 759px) {
-  .hero-stage[data-scene-live] {
-    height: auto;
-  }
-  .hero-stage[data-scene-live] .hero__imgwrap > img {
-    opacity: 1;
-  }
+/* Niente strato oltre la testa d'oro: il contenitore delle fasce è
+   tagliato alla linea della print-head — il nuovo strato nasce sotto
+   la linea, come in una stampa vera. La testa è sorella di .hero__bands
+   (dentro .hero__imgwrap) per non finire tagliata lei stessa. */
+.hero-stage[data-scene-live] .hero__bands {
+  clip-path: inset(calc((1 - var(--pp, 0)) * 100%) 0 0 0);
 }
+
+/* Il frontier della stampa: la testa d'oro risale la foto.
+   Vita propria solo durante la finestra di stampa (--k-head),
+   mai durante la dissolvenza che la precede. */
+.hero-stage[data-scene-live] .print-head {
+  bottom: calc(var(--pp, 0) * 100%);
+  opacity: var(--k-head, 0);
+}
+
+/* Plate fantasma sotto la foto: lo spessore steso dell'oggetto.
+   La deriva è orizzontale (layer shift ai lati, come le fasce con
+   il loro micro-offset X): non verticale, onde evitare che il
+   plate vada a sbattere sopra la didascalia (fix 2026-10-13). */
+.hero__ghost {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  right: 0.55rem;
+  aspect-ratio: 4 / 3;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero-stage[data-scene-live] .hero__ghost {
+  opacity: var(--k-ghost, 0);
+}
+.hero-stage[data-scene-live] .hero__ghost[data-ghost='1'] {
+  translate: calc(var(--k-ghost, 0) * 14px) 0;
+  scale: 0.975;
+  background: var(--paper-dim);
+  border: 1px solid var(--line-dark);
+}
+.hero-stage[data-scene-live] .hero__ghost[data-ghost='2'] {
+  translate: calc(var(--k-ghost, 0) * -14px) 0;
+  scale: 0.95;
+  background: color-mix(in srgb, var(--purple) 12%, var(--paper-dim));
+  border: 1px solid color-mix(in srgb, var(--purple) 55%, transparent);
+}
+
+/* Dal 2026-10-16 l'intro vive anche sotto 760px e lo stage è un
+   blocco normale a ogni larghezza: niente più kill-switch mobile
+   (niente pin = niente spazio morto, niente flick da scroll). */
