@@ -23,9 +23,12 @@ const works = (await getCollection('works'))
   .sort((a, b) => a.data.order - b.data.order);
 /* Selezione curata a mano per il mosaico della home: uno slug per cella,
    nell'ordine di collocamento (la prima copre la cella grande 6×6).
-   Aggiornare questa lista per cambiare i pezzi in vetrina. */
+   Aggiornare questa lista per cambiare i pezzi in vetrina. Con 8 tessere
+   il posizionamento automatico non lascia buche: 6+6 | 3+3 | 3+3 | 4+4+4.
+   Un'eventuale nona tessera diventa una banda a tutta larghezza (regola
+   :last-child nel CSS qui sotto). */
 const spotlightSlugs = [
-  'mario', 'umbreon', 'sorcerer-mickey', 'tweety', 'daffy-duck', 'gardevoir', 'diddy-kong', 'shy-guy',
+  'mario', 'umbreon', 'sorcerer-mickey', 'tweety', 'daffy-duck', 'gardevoir', 'diddy-kong', 'shy-guy', 'katana-stand',
 ] as const;
 const spotlight = spotlightSlugs
   .map((slug) => works.find((e) => e.id.replace(/\.(it|en)$/, '') === slug))
@@ -312,6 +315,21 @@ const sections: Array<{ id: string; label: UIKey }> = [
     .works-mosaic__cell:nth-child(8n + 8) {
       grid-column: span 4;
       grid-row: span 4;
+    }
+    /* Nona tessera (se c'è): banda a tutta larghezza. Il pattern tarato
+       su 8 tessere lascerebbe una buca 6×6 dopo la fila 4+4+4. */
+    .works-mosaic__cell:nth-child(8n + 1):last-child {
+      grid-column: span 12;
+      grid-row: span 4;
+    }
+    /* La copertina del pezzo in banda è verticale: il ritaglio di
+       default (centro) mostrerebbe il muro vuoto — si inquadra la
+       fascia alta della foto centrando la katana, senza il fodero
+       (misurato sul campo, ~18%). L'img vive nel componente
+       ProductPlate: la parte discendente va globalizzata, altrimenti
+       lo scoping di Astro non la raggiunge. */
+    .works-mosaic__cell:nth-child(8n + 1):last-child :global(.plate__media img) {
+      object-position: 50% 18%;
     }
   }
   .works-more {

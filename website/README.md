@@ -48,11 +48,10 @@ I contatti attuali (handle Instagram, email) sono **placeholder**: sostituirli i
 - **Immagini generiche (hero, chi-siamo, ecc.):** in `public/images/`, usate nei
   componenti con `asset('images/file.jpg')` (es. `src/components/pages/HomePage.astro`).
 
-Le immagini dei pezzi sono attualmente placeholder SVG generati (`npm run placeholders`).
-Quando arrivate le foto custom, basta salvarle in `public/images/works/` con lo stesso
-nome del file referenziato nei `.md` (es. `dragon-bust-1.jpg`) e aggiornare i path
-nei frontmatter: un solo file per foto basta (le varianti `-dark` servivano solo
-ai placeholder SVG per i due temi). La foto del laboratorio: `public/images/studio.jpg` è
+Le foto dei pezzi sono vere (in `public/images/works/`, referenziate dai
+`.md`); i pezzi nuovi seguono questo paragrafo: basta salvarle con lo stesso
+nome del file referenziato nei `.md` (es. `katana-stand-1.jpg`) e aggiornare i path
+nei frontmatter: un solo file per foto basta. La foto del laboratorio: `public/images/studio.jpg` è
 l'originale full-res, `public/images/studio-16.jpg` (1600px) è la versione
 compressa usata dal sito (rigenerabile con
 `sips -Z 1600 -s format jpeg -s formatOptions 72`): quando aggiorni la foto,
